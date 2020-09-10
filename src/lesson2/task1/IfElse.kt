@@ -179,17 +179,17 @@ fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int {
     if (a in c..d)
         k = a
     if (b in c..d)
-        if (k != null)
+        if (k != null && k != b)
             return abs(k - b)
         else
             k = b
     if (c in a..b)
-        if (k != null)
+        if (k != null && k != c)
             return abs(k - c)
         else
             k = c
     if (d in a..b)
-        if (k != null)
+        if (k != null && k != d)
             return abs(k - d)
     return -1
 }
