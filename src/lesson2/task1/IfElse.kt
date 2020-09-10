@@ -176,12 +176,13 @@ fun triangleKind(a: Double, b: Double, c: Double): Int = when {
  */
 fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int {
     var k: Int? = null
+    var buff = -1
     if (a in c..d)
         k = a
     if (b in c..d)
         if (k != null)
             if (k == b)
-                return 0
+                buff = 0
             else
                 return abs(k - b)
         else
@@ -189,13 +190,20 @@ fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int {
     if (c in a..b)
         if (k != null)
             if (k == c)
-                return 0
+                buff = 0
             else
                 return abs(k - c)
         else
             k = c
     if (d in a..b)
-        if (k != null && k != d)
-            return abs(k - d)
-    return -1
+        if (k != null)
+            if (k == d)
+                buff = 0
+            else
+                return abs(k - c)
+    return buff
+}
+fun main()
+{
+
 }
