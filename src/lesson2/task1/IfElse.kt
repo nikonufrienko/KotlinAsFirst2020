@@ -200,10 +200,10 @@ fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int {
             if (k == d)
                 buff = 0
             else
-                return abs(k - c)
+                return abs(k - d)
     return buff
 }
 fun main()
 {
-
+    println(segmentLength(3, 6, 1, 4))
 }
