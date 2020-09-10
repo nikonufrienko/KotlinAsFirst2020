@@ -3,6 +3,8 @@
 package lesson2.task1
 
 import lesson1.task1.discriminant
+import kotlin.math.abs
+//import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.math.sqrt
 
@@ -68,7 +70,13 @@ fun minBiRoot(a: Double, b: Double, c: Double): Double {
  * Мой возраст. Для заданного 0 < n < 200, рассматриваемого как возраст человека,
  * вернуть строку вида: «21 год», «32 года», «12 лет».
  */
-fun ageDescription(age: Int): String = TODO()
+fun ageDescription(age: Int): String = "$age " + when {
+    age % 100 in 11..20 -> "лет"
+    age % 10 == 1 -> "год"
+    age % 10 in 2..4 -> "года"
+    else -> "лет"
+}
+
 
 /**
  * Простая (2 балла)
@@ -81,7 +89,18 @@ fun timeForHalfWay(
     t1: Double, v1: Double,
     t2: Double, v2: Double,
     t3: Double, v3: Double
-): Double = TODO()
+): Double {
+    var s: Double = (t1 * v1 + t2 * v2 + t3 * v3) / 2
+    if (t1 * v1 > s)
+        return s / v1
+    else
+        s -= v1 * t1
+    if (t2 * v2 > s)
+        return s / v2 + t1
+    else
+        s -= v2 * t2
+    return s / v3 + t1 + t2
+}
 
 /**
  * Простая (2 балла)
@@ -96,7 +115,17 @@ fun whichRookThreatens(
     kingX: Int, kingY: Int,
     rookX1: Int, rookY1: Int,
     rookX2: Int, rookY2: Int
-): Int = TODO()
+): Int = when {
+    (kingX > rookX1 && kingX > rookX2 && kingY == rookY1 && rookY1 == rookY2)
+            || (kingX < rookX1 && kingX < rookX2 && kingY == rookY1 && rookY1 == rookY2)
+            || (kingY < rookY1 && kingY < rookY2 && kingX == rookX1 && rookX1 == rookX2)
+            || (kingY > rookY1 && kingY > rookY2 && kingX == rookX1 && rookX1 == rookX2) -> 1
+    (kingX == rookX1 || kingY == rookY1) && (kingX == rookX2 || kingY == rookY2) -> 3
+    kingX == rookX1 || kingY == rookY1 -> 1
+    kingX == rookX2 || kingY == rookY2 -> 2
+    else -> 0
+
+}
 
 /**
  * Простая (2 балла)
@@ -112,7 +141,14 @@ fun rookOrBishopThreatens(
     kingX: Int, kingY: Int,
     rookX: Int, rookY: Int,
     bishopX: Int, bishopY: Int
-): Int = TODO()
+): Int = when {
+    abs(kingY - bishopY) == abs(kingX - bishopX) && abs(rookY - bishopY) == abs(rookX - bishopX)
+            && ((rookX > kingX && bishopX > kingX) || (rookX < kingX && bishopX < kingX)) -> 0
+    abs(kingY - bishopY) == abs(kingX - bishopX) && (rookX == kingX || rookY == kingY) -> 3
+    abs(kingY - bishopY) == abs(kingX - bishopX) -> 2
+    rookX == kingX || rookY == kingY -> 1
+    else -> 0
+}
 
 /**
  * Простая (2 балла)
@@ -122,7 +158,13 @@ fun rookOrBishopThreatens(
  * прямоугольным (вернуть 1) или тупоугольным (вернуть 2).
  * Если такой треугольник не существует, вернуть -1.
  */
-fun triangleKind(a: Double, b: Double, c: Double): Int = TODO()
+fun triangleKind(a: Double, b: Double, c: Double): Int = when {
+    // мне проще умножить чем возводить в степень
+    a > b + c || b > c + a || c > a + b -> -1
+    a * a > b * b + c * c || c * c > b * b + a * a || b * b > a * a + c * c -> 2
+    a * a == b * b + c * c || c * c == b * b + a * a || b * b == a * a + c * c -> 1
+    else -> 0
+}
 
 /**
  * Средняя (3 балла)
