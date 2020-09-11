@@ -4,6 +4,7 @@ package lesson3.task1
 
 import kotlin.math.sqrt
 
+//import kotlin.math
 // Урок 3: циклы
 // Максимальное количество баллов = 9
 // Рекомендуемое количество баллов = 7
@@ -16,8 +17,8 @@ import kotlin.math.sqrt
  */
 fun factorial(n: Int): Double {
     var result = 1.0
-    for (i in 1..n) {
-        result = result * i // Please do not fix in master
+    for (i in 1 .. n) {
+        result *= i // Please do not fix in master
     }
     return result
 }
@@ -31,7 +32,7 @@ fun isPrime(n: Int): Boolean {
     if (n < 2) return false
     if (n == 2) return true
     if (n % 2 == 0) return false
-    for (m in 3..sqrt(n.toDouble()).toInt() step 2) {
+    for (m in 3 .. sqrt(n.toDouble()).toInt() step 2) {
         if (n % m == 0) return false
     }
     return true
@@ -44,7 +45,7 @@ fun isPrime(n: Int): Boolean {
  */
 fun isPerfect(n: Int): Boolean {
     var sum = 1
-    for (m in 2..n / 2) {
+    for (m in 2 .. n / 2) {
         if (n % m > 0) continue
         sum += m
         if (sum > n) break
@@ -72,7 +73,15 @@ fun digitCountInNumber(n: Int, m: Int): Int =
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun digitNumber(n: Int): Int = TODO()
+fun digitNumber(n: Int): Int {
+    var z = n
+    var i = 0
+    do {
+        i++
+        z /= 10
+    } while (z > 0)
+    return i
+}
 
 /**
  * Простая (2 балла)
@@ -80,21 +89,45 @@ fun digitNumber(n: Int): Int = TODO()
  * Найти число Фибоначчи из ряда 1, 1, 2, 3, 5, 8, 13, 21, ... с номером n.
  * Ряд Фибоначчи определён следующим образом: fib(1) = 1, fib(2) = 1, fib(n+2) = fib(n) + fib(n+1)
  */
-fun fib(n: Int): Int = TODO()
+/*
+fun pow(var n:Int): Int{
+
+}*/
+fun fib(n: Int): Int {
+    val fi1: Double = (1 + sqrt(5.0)) / 2
+    val fi2: Double = (1 - sqrt(5.0)) / 2
+    var k1 = 1.0
+    var k2 = 1.0
+    for (i in 0 until n) {
+        k1 *= fi1
+        k2 *= fi2
+    }
+    return ((k1 - k2) / sqrt(5.0)).toInt()
+}
 
 /**
  * Простая (2 балла)
  *
  * Для заданного числа n > 1 найти минимальный делитель, превышающий 1
  */
-fun minDivisor(n: Int): Int = TODO()
+fun minDivisor(n: Int): Int {
+    for (i in 2 .. sqrt(n.toDouble()).toInt())
+        if (n % i == 0)
+            return i
+    return n
+}
 
 /**
  * Простая (2 балла)
  *
  * Для заданного числа n > 1 найти максимальный делитель, меньший n
  */
-fun maxDivisor(n: Int): Int = TODO()
+fun maxDivisor(n: Int): Int {
+    for (i in (sqrt(n.toDouble()).toInt() until n).reversed())
+        if (n % i == 0)
+            return i
+    return 1
+}
 
 /**
  * Простая (2 балла)
