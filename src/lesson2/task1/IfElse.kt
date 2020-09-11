@@ -90,7 +90,7 @@ fun timeForHalfWay(
     t2: Double, v2: Double,
     t3: Double, v3: Double
 ): Double {
-    var s: Double = (t1 * v1 + t2 * v2 + t3 * v3) / 2
+    var s = (t1 * v1 + t2 * v2 + t3 * v3) / 2
     if (t1 * v1 > s)
         return s / v1
     else
@@ -115,16 +115,15 @@ fun whichRookThreatens(
     kingX: Int, kingY: Int,
     rookX1: Int, rookY1: Int,
     rookX2: Int, rookY2: Int
-): Int = when {
-    (kingX > rookX1 && kingX > rookX2 && kingY == rookY1 && rookY1 == rookY2)
-            || (kingX < rookX1 && kingX < rookX2 && kingY == rookY1 && rookY1 == rookY2)
-            || (kingY < rookY1 && kingY < rookY2 && kingX == rookX1 && rookX1 == rookX2)
-            || (kingY > rookY1 && kingY > rookY2 && kingX == rookX1 && rookX1 == rookX2) -> 1
-    (kingX == rookX1 || kingY == rookY1) && (kingX == rookX2 || kingY == rookY2) -> 3
-    kingX == rookX1 || kingY == rookY1 -> 1
-    kingX == rookX2 || kingY == rookY2 -> 2
-    else -> 0
-
+): Int {
+    val a1 = (kingX == rookX1) || (kingY == rookY1)
+    val a2 = (kingX == rookX2) || (kingY == rookY2)
+    return when {
+        a1 && a2 -> 3
+        a1 -> 1
+        a2 -> 2
+        else -> 0
+    }
 }
 
 /**
@@ -137,17 +136,20 @@ fun whichRookThreatens(
  * и 3, если угроза есть и от ладьи и от слона.
  * Считать, что ладья и слон не могут загораживать друг друга.
  */
+
 fun rookOrBishopThreatens(
     kingX: Int, kingY: Int,
     rookX: Int, rookY: Int,
     bishopX: Int, bishopY: Int
-): Int = when {
-    abs(kingY - bishopY) == abs(kingX - bishopX) && abs(rookY - bishopY) == abs(rookX - bishopX)
-            && ((rookX > kingX && bishopX > kingX) || (rookX < kingX && bishopX < kingX)) -> 0
-    abs(kingY - bishopY) == abs(kingX - bishopX) && (rookX == kingX || rookY == kingY) -> 3
-    abs(kingY - bishopY) == abs(kingX - bishopX) -> 2
-    rookX == kingX || rookY == kingY -> 1
-    else -> 0
+): Int {
+    val r = rookX == kingX || rookY == kingY
+    val b = abs(bishopX - kingX) == abs(bishopY - kingY)
+    return when {
+        b && r -> 3
+        b -> 2
+        r -> 1
+        else -> 0
+    }
 }
 
 /**
@@ -175,35 +177,32 @@ fun triangleKind(a: Double, b: Double, c: Double): Int = when {
  * Если пересечения нет, вернуть -1.
  */
 fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int {
-    var k: Int? = null
-    var buff = -1
-    if (a in c..d)
-        k = a
-    if (b in c..d)
-        if (k != null)
-            if (k == b)
-                buff = 0
-            else
-                return abs(k - b)
-        else
-            k = b
-    if (c in a..b)
-        if (k != null)
-            if (k == c)
-                buff = 0
-            else
-                return abs(k - c)
-        else
-            k = c
-    if (d in a..b)
-        if (k != null)
-            if (k == d)
-                buff = 0
-            else
-                return abs(k - d)
-    return buff
+    val arr = Array(4) { 0 }
+    var i = 0
+    if (a in c..d) {
+        arr[i] = a
+        i++
+    }
+    if (b in c..d) {
+        arr[i] = b
+        i++
+    }
+    if (c in a..b) {
+        arr[i] = c
+        i++
+    }
+    if (d in a..b) {
+        arr[i] = d
+        i++
+    }
+    when {
+        i == 2 -> return abs(arr[0] - arr[1])
+        i == 3 -> return maxOf(abs(arr[0] - arr[1]), abs(arr[1] - arr[2]), abs(arr[2] - arr[0]))
+        i == 4 -> return abs(c - d)
+        else -> return -1
+    }
 }
-fun main()
-{
+
+fun main() {
     println(segmentLength(3, 6, 1, 4))
 }
