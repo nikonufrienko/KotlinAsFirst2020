@@ -71,9 +71,9 @@ fun minBiRoot(a: Double, b: Double, c: Double): Double {
  * вернуть строку вида: «21 год», «32 года», «12 лет».
  */
 fun ageDescription(age: Int): String = "$age " + when {
-    age % 100 in 11..20 -> "лет"
+    age % 100 in 11 .. 20 -> "лет"
     age % 10 == 1 -> "год"
-    age % 10 in 2..4 -> "года"
+    age % 10 in 2 .. 4 -> "года"
     else -> "лет"
 }
 
@@ -176,33 +176,15 @@ fun triangleKind(a: Double, b: Double, c: Double): Int = when {
  * Найти длину пересечения отрезков AB и CD.
  * Если пересечения нет, вернуть -1.
  */
-fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int {
-    val arr = Array(4) { 0 }
-    var i = 0
-    if (a in c..d) {
-        arr[i] = a
-        i++
-    }
-    if (b in c..d) {
-        arr[i] = b
-        i++
-    }
-    if (c in a..b) {
-        arr[i] = c
-        i++
-    }
-    if (d in a..b) {
-        arr[i] = d
-        i++
-    }
-    when {
-        i == 2 -> return abs(arr[0] - arr[1])
-        i == 3 -> return maxOf(abs(arr[0] - arr[1]), abs(arr[1] - arr[2]), abs(arr[2] - arr[0]))
-        i == 4 -> return abs(c - d)
-        else -> return -1
-    }
+fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int = when {
+    (a == c && b == d) || (a in c .. d && b in c .. d) ||
+            (a == c && b in c .. d) || (b == d && a in c .. d) -> b - a
+    (d in a .. b && c in a .. b) || (c == a && d in a .. b) ||
+            (d == b && c in a .. b) -> d - c
+    c in a .. b && b in c .. d -> b - c
+    a in c .. d && d in a .. b -> d - a
+    else -> -1
+    // можете пожалуйста закрыть submission, что бы я мог отправлять другие задачи
+
 }
 
-fun main() {
-    println(segmentLength(3, 6, 1, 4))
-}
