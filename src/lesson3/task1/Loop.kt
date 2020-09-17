@@ -295,7 +295,7 @@ fun cos(x: Double, eps: Double): Double = sin(PI / 2 - x % (2 * PI), eps)
  */
 fun squareSequenceDigit(n: Int): Int {
     var a = 0
-    var currDigitNumber = 0//кол-во цифр с учётом текущего числа
+    var currDigitNumber = 0 //кол-во цифр с учётом текущего числа
     while (currDigitNumber < n) {
         a++
         currDigitNumber += digitNumber(a * a)
@@ -322,7 +322,7 @@ fun squareSequenceDigit(n: Int): Int {
 fun fibSequenceDigit(n: Int): Int {
     var a = 0
     var buff = 0 //здесь будет лежать значение fib(a) что бы не вызывать функцию по несколько раз
-    var currDigitNumber = 0//кол-во цифр с учётом текущего числа
+    var currDigitNumber = 0 //кол-во цифр с учётом текущего числа
     while (currDigitNumber < n) {
         a++
         buff = fib(a)
