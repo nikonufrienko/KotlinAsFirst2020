@@ -75,7 +75,7 @@ fun digitCountInNumber(n: Int, m: Int): Int =
  * Использовать операции со строками в этой задаче запрещается.
  */
 fun digitNumber(n: Int): Int {
-    var z = n
+    var z = abs(n)
     var i = 0
     do {
         i++
@@ -293,11 +293,15 @@ fun cos(x: Double, eps: Double): Double = sin(PI / 2 - x % (2 * PI), eps)
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun squareSequenceDigit(n: Int): Int {
+fun squareSequenceDigit(n: Int): Int? {
+    if (n < 0)
+        return null
     var a = 0
     var currDigitNumber = 0 //кол-во цифр с учётом текущего числа
     while (currDigitNumber < n) {
         a++
+        if (a > 46340) //ограничение для того что бы квадрат числа не привысил макс. знач. int
+            return null
         currDigitNumber += digitNumber(a * a)
     }
     var digitNumberInNumber = n - currDigitNumber + digitNumber(a * a)
@@ -319,13 +323,15 @@ fun squareSequenceDigit(n: Int): Int {
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun fibSequenceDigit(n: Int): Int {
+fun fibSequenceDigit(n: Int): Int? {
     var a = 0
     var buff = 0 //здесь будет лежать значение fib(a) что бы не вызывать функцию по несколько раз
     var currDigitNumber = 0 //кол-во цифр с учётом текущего числа
     while (currDigitNumber < n) {
         a++
         buff = fib(a)
+        if (buff == 2147483647) //тк в функции fib происходит приведение через метод toDouble
+            return null
         currDigitNumber += digitNumber(buff)
     }
     var digitNumberInNumber = n - currDigitNumber + digitNumber(buff)
