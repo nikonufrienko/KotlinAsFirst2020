@@ -304,13 +304,13 @@ fun squareSequenceDigit(n: Int): Int? {
             return null
         currDigitNumber += digitNumber(a * a)
     }
-    var digitNumberInNumber = n - currDigitNumber + digitNumber(a * a)
-    var revertedNumber = revert(a * a) //переворачиваем число для упрощения
-    while (digitNumberInNumber > 1) {
-        revertedNumber /= 10
+    var digitNumberInNumber = currDigitNumber - n//номер с конца числа
+    var k = a * a
+    while (digitNumberInNumber > 0) {
+        k /= 10
         digitNumberInNumber--
     }
-    return revertedNumber % 10
+    return k % 10
 
 }
 
@@ -334,11 +334,10 @@ fun fibSequenceDigit(n: Int): Int? {
             return null
         currDigitNumber += digitNumber(buff)
     }
-    var digitNumberInNumber = n - currDigitNumber + digitNumber(buff)
-    var revertedNumber = revert(buff) //переворачиваем число для упрощения
-    while (digitNumberInNumber > 1) {
-        revertedNumber /= 10
+    var digitNumberInNumber = currDigitNumber - n//номер с конца числа
+    while (digitNumberInNumber > 0) {
+        buff /= 10
         digitNumberInNumber--
     }
-    return revertedNumber % 10
+    return buff % 10
 }
