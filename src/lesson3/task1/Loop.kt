@@ -75,12 +75,12 @@ fun digitCountInNumber(n: Int, m: Int): Int =
  * Использовать операции со строками в этой задаче запрещается.
  */
 fun digitNumber(n: Int): Int {
-    var z = abs(n)
+    var number = abs(n)
     var i = 0
     do {
         i++
-        z /= 10
-    } while (z > 0)
+        number /= 10
+    } while (number > 0)
     return i
 }
 
@@ -95,8 +95,8 @@ fun pow(var n:Int): Int{
 
 }*/
 fun fib(n: Int): Int {
-    val k1: Double = ((1 + sqrt(5.0)) / 2).pow(n.toDouble())
-    val k2: Double = (1 - sqrt(5.0)) / 2
+    val k1 = ((1 + sqrt(5.0)) / 2).pow(n.toDouble())
+    val k2 = (1 - sqrt(5.0)) / 2
     return ((k1 - k2) / sqrt(5.0)).toInt()
 }
 
