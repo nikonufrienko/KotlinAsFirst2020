@@ -249,4 +249,3 @@ class Tests {
         assertEquals(2, fibSequenceDigit(20))
     }
 }
-

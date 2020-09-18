@@ -2,6 +2,7 @@
 
 package lesson3.task1
 
+import lesson1.task1.sqr
 import kotlin.math.*
 
 
@@ -18,8 +19,8 @@ import kotlin.math.*
  */
 fun factorial(n: Int): Double {
     var result = 1.0
-    for (i in 1 .. n) {
-        result *= i // Please do not fix in master
+    for (counterForLoop in 1 .. n) {
+        result *= counterForLoop // Please do not fix in master
     }
     return result
 }
@@ -76,12 +77,12 @@ fun digitCountInNumber(n: Int, m: Int): Int =
  */
 fun digitNumber(n: Int): Int {
     var number = abs(n)
-    var i = 0
+    var counterForLoop = 0
     do {
-        i++
+        counterForLoop++
         number /= 10
     } while (number > 0)
-    return i
+    return counterForLoop
 }
 
 /**
@@ -90,14 +91,10 @@ fun digitNumber(n: Int): Int {
  * Найти число Фибоначчи из ряда 1, 1, 2, 3, 5, 8, 13, 21, ... с номером n.
  * Ряд Фибоначчи определён следующим образом: fib(1) = 1, fib(2) = 1, fib(n+2) = fib(n) + fib(n+1)
  */
-/*
-fun pow(var n:Int): Int{
-
-}*/
 fun fib(n: Int): Int {
-    val k1 = ((1 + sqrt(5.0)) / 2).pow(n.toDouble())
-    val k2 = (1 - sqrt(5.0)) / 2
-    return ((k1 - k2) / sqrt(5.0)).toInt()
+    val member1 = ((1 + sqrt(5.0)) / 2).pow(n.toDouble())
+    val member2 = (1 - sqrt(5.0)) / 2
+    return ((member1 - member2) / sqrt(5.0)).toInt()
 }
 
 /**
@@ -106,9 +103,9 @@ fun fib(n: Int): Int {
  * Для заданного числа n > 1 найти минимальный делитель, превышающий 1
  */
 fun minDivisor(n: Int): Int {
-    for (i in 2 .. sqrt(n.toDouble()).toInt())
-        if (n % i == 0)
-            return i
+    for (counterForLoop in 2 .. sqrt(n.toDouble()).toInt())
+        if (n % counterForLoop == 0)
+            return counterForLoop
     return n
 }
 
@@ -118,9 +115,9 @@ fun minDivisor(n: Int): Int {
  * Для заданного числа n > 1 найти максимальный делитель, меньший n
  */
 fun maxDivisor(n: Int): Int {
-    for (i in (sqrt(n.toDouble()).toInt() until n).reversed())
-        if (n % i == 0)
-            return i
+    for (counterForLoop in (sqrt(n.toDouble()).toInt() until n).reversed())
+        if (n % counterForLoop == 0)
+            return counterForLoop
     return 1
 }
 
@@ -141,16 +138,16 @@ fun maxDivisor(n: Int): Int {
  * этого для какого-либо начального X > 0.
  */
 fun collatzSteps(x: Int): Int {
-    var k = x
-    var i = 0
-    while (k != 1) {
-        if (k % 2 == 0)
-            k /= 2
+    var x2 = x
+    var counterForLoop = 0
+    while (x2 != 1) {
+        if (x2 % 2 == 0)
+            x2 /= 2
         else
-            k = k * 3 + 1
-        i++
+            x2 = x2 * 3 + 1
+        counterForLoop++
     }
-    return i
+    return counterForLoop
 }
 
 /**
@@ -180,10 +177,12 @@ fun isCoPrime(m: Int, n: Int): Boolean {
         return true
     val a = maxOf(m, n)
     val b = minOf(m, n)
-    for (i in 2 .. sqrt(a.toDouble()).toInt())
-        if (a % i == 0)
-            if (b % i == 0 || b % (a / i) == 0)
-                return false
+    for (counterForLoop in 2 .. sqrt(b.toDouble()).toInt()) {
+        if (a % counterForLoop != 0)
+            continue
+        if (b % counterForLoop == 0 || b % (a / counterForLoop) == 0)
+            return false
+    }
     return true
 }
 
@@ -195,9 +194,11 @@ fun isCoPrime(m: Int, n: Int): Boolean {
  * Например, для интервала 21..28 21 <= 5*5 <= 28, а для интервала 51..61 квадрата не существует.
  */
 fun squareBetweenExists(m: Int, n: Int): Boolean {
-    val a = sqrt(m.toDouble())
-    val b = sqrt(n.toDouble())
-    if (b.toInt() - a.toInt() >= 1 || a == a.toInt().toDouble() || b == b.toInt().toDouble())
+    val lowBound = sqrt(m.toDouble())
+    val highBound = sqrt(n.toDouble())
+    if (highBound.toInt() - lowBound.toInt() >= 1 || lowBound == lowBound.toInt().toDouble()
+        || highBound == highBound.toInt().toDouble()
+    )
         return true
     return false
 
@@ -211,14 +212,14 @@ fun squareBetweenExists(m: Int, n: Int): Boolean {
  * Использовать операции со строками в этой задаче запрещается.
  */
 fun revert(n: Int): Int {
-    var m = n
-    var k = 0
-    while (m > 0) {
-        k *= 10
-        k += m % 10
-        m /= 10
+    var n2 = n
+    var answer = 0
+    while (n2 > 0) {
+        answer *= 10
+        answer += n2 % 10
+        n2 /= 10
     }
-    return k
+    return answer
 }
 
 /**
@@ -241,12 +242,12 @@ fun isPalindrome(n: Int): Boolean = revert(n) == n
  * Использовать операции со строками в этой задаче запрещается.
  */
 fun hasDifferentDigits(n: Int): Boolean {
-    var a = n
-    val b = a % 10
-    while (a > 0) {
-        if (a % 10 != b)
+    var number = n
+    val digit = number % 10
+    while (number > 0) {
+        if (number % 10 != digit)
             return true
-        a /= 10
+        number /= 10
     }
     return false
 }
@@ -262,15 +263,15 @@ fun hasDifferentDigits(n: Int): Boolean {
  */
 fun sin(x: Double, eps: Double): Double {
     val x2 = x % (2 * PI)
-    var d = x2
-    var a = 0.0
+    var member = x2
+    var answer = 0.0
     var i = 1
     do {
-        a += d
-        d *= -(x2 * x2) / (2 * i * (2 * i + 1))
+        answer += member
+        member *= -(sqr(x2)) / (2 * i * (2 * i + 1))
         i++
-    } while (abs(d) > eps)
-    return a
+    } while (abs(member) > eps)
+    return answer
 }
 
 /**
@@ -334,10 +335,11 @@ fun fibSequenceDigit(n: Int): Int? {
             return null
         currDigitNumber += digitNumber(buff)
     }
-    var digitNumberInNumber = currDigitNumber - n//номер с конца числа
+    var digitNumberInNumber = currDigitNumber - n //номер с конца числа
     while (digitNumberInNumber > 0) {
         buff /= 10
         digitNumberInNumber--
     }
     return buff % 10
 }
+
