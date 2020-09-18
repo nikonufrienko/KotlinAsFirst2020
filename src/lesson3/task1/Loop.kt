@@ -196,11 +196,8 @@ fun isCoPrime(m: Int, n: Int): Boolean {
 fun squareBetweenExists(m: Int, n: Int): Boolean {
     val lowBound = sqrt(m.toDouble())
     val highBound = sqrt(n.toDouble())
-    if (highBound.toInt() - lowBound.toInt() >= 1 || lowBound == lowBound.toInt().toDouble()
-        || highBound == highBound.toInt().toDouble()
-    )
-        return true
-    return false
+    return (highBound.toInt() - lowBound.toInt() >= 1 || lowBound == lowBound.toInt().toDouble()
+            || highBound == highBound.toInt().toDouble())
 
 }
 
@@ -231,7 +228,7 @@ fun revert(n: Int): Int {
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun isPalindrome(n: Int): Boolean = revert(n) == n
+fun isPalindrome(n: Int) = revert(n) == n
 
 /**
  * Средняя (3 балла)
@@ -294,15 +291,11 @@ fun cos(x: Double, eps: Double): Double = sin(PI / 2 - x % (2 * PI), eps)
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun squareSequenceDigit(n: Int): Int? {
-    if (n < 0)
-        return null
+fun squareSequenceDigit(n: Int): Int {
     var a = 0
     var currDigitNumber = 0 //кол-во цифр с учётом текущего числа
     while (currDigitNumber < n) {
         a++
-        if (a > 46340) //ограничение для того что бы квадрат числа не привысил макс. знач. int
-            return null
         currDigitNumber += digitNumber(a * a)
     }
     var digitNumberInNumber = currDigitNumber - n//номер с конца числа
@@ -324,15 +317,13 @@ fun squareSequenceDigit(n: Int): Int? {
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun fibSequenceDigit(n: Int): Int? {
+fun fibSequenceDigit(n: Int): Int {
     var a = 0
     var buff = 0 //здесь будет лежать значение fib(a) что бы не вызывать функцию по несколько раз
     var currDigitNumber = 0 //кол-во цифр с учётом текущего числа
     while (currDigitNumber < n) {
         a++
         buff = fib(a)
-        if (buff == 2147483647) //тк в функции fib происходит приведение через метод toDouble
-            return null
         currDigitNumber += digitNumber(buff)
     }
     var digitNumberInNumber = currDigitNumber - n //номер с конца числа
