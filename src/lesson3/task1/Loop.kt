@@ -19,8 +19,8 @@ import kotlin.math.*
  */
 fun factorial(n: Int): Double {
     var result = 1.0
-    for (counterForLoop in 1 .. n) {
-        result *= counterForLoop // Please do not fix in master
+    for (i in 1 .. n) {
+        result *= i // Please do not fix in master
     }
     return result
 }
