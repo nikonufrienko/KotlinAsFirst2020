@@ -77,12 +77,12 @@ fun digitCountInNumber(n: Int, m: Int): Int =
  */
 fun digitNumber(n: Int): Int {
     var number = abs(n)
-    var counterForLoop = 0
+    var numberOfDigits = 0
     do {
-        counterForLoop++
+        numberOfDigits++
         number /= 10
     } while (number > 0)
-    return counterForLoop
+    return numberOfDigits
 }
 
 /**
@@ -103,9 +103,9 @@ fun fib(n: Int): Int {
  * Для заданного числа n > 1 найти минимальный делитель, превышающий 1
  */
 fun minDivisor(n: Int): Int {
-    for (counterForLoop in 2 .. sqrt(n.toDouble()).toInt())
-        if (n % counterForLoop == 0)
-            return counterForLoop
+    for (divisor in 2 .. sqrt(n.toDouble()).toInt())
+        if (n % divisor == 0)
+            return divisor
     return n
 }
 
@@ -115,9 +115,9 @@ fun minDivisor(n: Int): Int {
  * Для заданного числа n > 1 найти максимальный делитель, меньший n
  */
 fun maxDivisor(n: Int): Int {
-    for (counterForLoop in (sqrt(n.toDouble()).toInt() until n).reversed())
-        if (n % counterForLoop == 0)
-            return counterForLoop
+    for (divisor in sqrt(n.toDouble()).toInt() downTo n)
+        if (n % divisor == 0)
+            return divisor
     return 1
 }
 
@@ -139,15 +139,15 @@ fun maxDivisor(n: Int): Int {
  */
 fun collatzSteps(x: Int): Int {
     var x2 = x
-    var counterForLoop = 0
+    var element = 0
     while (x2 != 1) {
         if (x2 % 2 == 0)
             x2 /= 2
         else
             x2 = x2 * 3 + 1
-        counterForLoop++
+        element++
     }
-    return counterForLoop
+    return element
 }
 
 /**
@@ -177,10 +177,10 @@ fun isCoPrime(m: Int, n: Int): Boolean {
         return true
     val a = maxOf(m, n)
     val b = minOf(m, n)
-    for (counterForLoop in 2 .. sqrt(b.toDouble()).toInt()) {
-        if (a % counterForLoop != 0)
+    for (divisor in 2 .. sqrt(b.toDouble()).toInt()) {
+        if (a % divisor != 0)
             continue
-        if (b % counterForLoop == 0 || b % (a / counterForLoop) == 0)
+        if (b % divisor == 0 || b % (a / divisor) == 0)
             return false
     }
     return true
@@ -196,8 +196,8 @@ fun isCoPrime(m: Int, n: Int): Boolean {
 fun squareBetweenExists(m: Int, n: Int): Boolean {
     val lowBound = sqrt(m.toDouble())
     val highBound = sqrt(n.toDouble())
-    return (highBound.toInt() - lowBound.toInt() >= 1 || lowBound == lowBound.toInt().toDouble()
-            || highBound == highBound.toInt().toDouble())
+    return highBound.toInt() - lowBound.toInt() >= 1 || lowBound == lowBound.toInt().toDouble()
+            || highBound == highBound.toInt().toDouble()
 
 }
 
