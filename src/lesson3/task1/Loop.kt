@@ -115,7 +115,7 @@ fun minDivisor(n: Int): Int {
  * Для заданного числа n > 1 найти максимальный делитель, меньший n
  */
 fun maxDivisor(n: Int): Int {
-    for (divisor in n-1 downTo sqrt(n.toDouble()).toInt())
+    for (divisor in n - 1 downTo sqrt(n.toDouble()).toInt())
         if (n % divisor == 0)
             return divisor
     return 1
