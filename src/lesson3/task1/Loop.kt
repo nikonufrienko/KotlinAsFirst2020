@@ -19,7 +19,7 @@ import kotlin.math.*
  */
 fun factorial(n: Int): Double {
     var result = 1.0
-    for (i in 1 .. n) {
+    for (i in 1..n) {
         result *= i // Please do not fix in master
     }
     return result
@@ -34,7 +34,7 @@ fun isPrime(n: Int): Boolean {
     if (n < 2) return false
     if (n == 2) return true
     if (n % 2 == 0) return false
-    for (m in 3 .. sqrt(n.toDouble()).toInt() step 2) {
+    for (m in 3..sqrt(n.toDouble()).toInt() step 2) {
         if (n % m == 0) return false
     }
     return true
@@ -47,7 +47,7 @@ fun isPrime(n: Int): Boolean {
  */
 fun isPerfect(n: Int): Boolean {
     var sum = 1
-    for (m in 2 .. (n / 2)) {
+    for (m in 2..(n / 2)) {
         if (n % m > 0) continue
         sum += m
         if (sum > n) break
@@ -103,7 +103,7 @@ fun fib(n: Int): Int {
  * Для заданного числа n > 1 найти минимальный делитель, превышающий 1
  */
 fun minDivisor(n: Int): Int {
-    for (divisor in 2 .. sqrt(n.toDouble()).toInt())
+    for (divisor in 2..sqrt(n.toDouble()).toInt())
         if (n % divisor == 0)
             return divisor
     return n
@@ -139,15 +139,15 @@ fun maxDivisor(n: Int): Int {
  */
 fun collatzSteps(x: Int): Int {
     var x2 = x
-    var element = 0
+    var steps = 0
     while (x2 != 1) {
         if (x2 % 2 == 0)
             x2 /= 2
         else
             x2 = x2 * 3 + 1
-        element++
+        steps++
     }
-    return element
+    return steps
 }
 
 /**
@@ -177,7 +177,7 @@ fun isCoPrime(m: Int, n: Int): Boolean {
         return true
     val a = maxOf(m, n)
     val b = minOf(m, n)
-    for (divisor in 2 .. sqrt(b.toDouble()).toInt()) {
+    for (divisor in 2..sqrt(b.toDouble()).toInt()) {
         if (a % divisor != 0)
             continue
         if (b % divisor == 0 || b % (a / divisor) == 0)
@@ -196,9 +196,8 @@ fun isCoPrime(m: Int, n: Int): Boolean {
 fun squareBetweenExists(m: Int, n: Int): Boolean {
     val lowBound = sqrt(m.toDouble())
     val highBound = sqrt(n.toDouble())
-    return highBound.toInt() - lowBound.toInt() >= 1 || lowBound == lowBound.toInt().toDouble()
-            || highBound == highBound.toInt().toDouble()
-
+    return ceil(highBound) - ceil(lowBound) >= 1 || lowBound == floor(lowBound)
+            || highBound == floor(highBound)
 }
 
 /**
@@ -265,7 +264,7 @@ fun sin(x: Double, eps: Double): Double {
     var i = 1
     do {
         answer += member
-        member *= -(sqr(x2)) / (2 * i * (2 * i + 1))
+        member *= -sqr(x2) / (2 * i * (2 * i + 1))
         i++
     } while (abs(member) > eps)
     return answer
@@ -298,7 +297,7 @@ fun squareSequenceDigit(n: Int): Int {
         a++
         currDigitNumber += digitNumber(a * a)
     }
-    var digitNumberInNumber = currDigitNumber - n//номер с конца числа
+    var digitNumberInNumber = currDigitNumber - n //номер с конца числа
     var k = a * a
     while (digitNumberInNumber > 0) {
         k /= 10
