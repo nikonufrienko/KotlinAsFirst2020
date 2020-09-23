@@ -246,6 +246,8 @@ fun convert(n: Int, base: Int): List<Int> {
         answer.add(n2 % base)
         n2 /= base
     }
+    if (answer.isEmpty())
+        return listOf(0)
     return answer.reversed()
 }
 
@@ -324,7 +326,7 @@ fun roman(n: Int): String = when {
     n < 4 -> "I" + roman(n - 1)
     n == 4 -> "IV"
     n in 5..8 -> "V" + roman(n - 5)
-    n == 9 -> "IX"
+    n == 9 -> "IX" 
     n in 10..39 -> "X" + roman(n - 10)
     n in 40..49 -> "XL" + roman(n - 40)
     n in 50..89 -> "L" + roman(n - 50)
@@ -368,7 +370,7 @@ fun russian(n: Int): String = when(n) {
     in 20..29 -> "двадцать " + russian(n - 20)
     in 30..39 -> "тридцать " + russian(n - 30)
     in 40..49 -> "сорок " + russian(n - 40)
-    in 50..59 -> "пятдесят " + russian(n - 50)
+    in 50..59 -> "пятьдесят " + russian(n - 50)
     in 60..69 -> "шестьдесят " + russian(n - 60)
     in 70..79 -> "семьдесят " + russian(n - 70)
     in 80..89 -> "восемьдесят " + russian(n - 80)
