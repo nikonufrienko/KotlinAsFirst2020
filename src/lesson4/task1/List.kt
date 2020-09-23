@@ -165,6 +165,7 @@ fun times(a: List<Int>, b: List<Int>): Int {
         result += a[i] * b[i]
     return result
 }
+
 /**
  * Средняя (3 балла)
  *
