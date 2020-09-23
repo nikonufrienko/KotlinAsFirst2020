@@ -234,7 +234,7 @@ fun factorize(n: Int): List<Int> {
  * Результат разложения вернуть в виде строки, например 75 -> 3*5*5
  * Множители в результирующей строке должны располагаться по возрастанию.
  */
-fun factorizeToString(n: Int): String = factorize(n).joinToString(separator = "*")
+fun factorizeToString(n: Int): String = factorize(n).joinToString("*")
 
 /**
  * Средняя (3 балла)
@@ -243,7 +243,15 @@ fun factorizeToString(n: Int): String = factorize(n).joinToString(separator = "*
  * Результат перевода вернуть в виде списка цифр в base-ичной системе от старшей к младшей,
  * например: n = 100, base = 4 -> (1, 2, 1, 0) или n = 250, base = 14 -> (1, 3, 12)
  */
-fun convert(n: Int, base: Int): List<Int> = TODO()
+fun convert(n: Int, base: Int): List<Int> {
+    val answer = mutableListOf<Int>()
+    var n2 = n
+    while (n2 > 0) {
+        answer.add(n2 % base)
+        n2 /= base
+    }
+    return answer.reversed()
+}
 
 /**
  * Сложная (4 балла)
@@ -256,7 +264,16 @@ fun convert(n: Int, base: Int): List<Int> = TODO()
  * Использовать функции стандартной библиотеки, напрямую и полностью решающие данную задачу
  * (например, n.toString(base) и подобные), запрещается.
  */
-fun convertToString(n: Int, base: Int): String = TODO()
+fun convertToString(n: Int, base: Int): String {
+    var answer = ""
+    val convertedToList = convert(n, base)
+    for (digit in convertedToList)
+        if (digit > 9)
+            answer += 'a' + digit - 10  //частенько юзал эту фичу в Си
+        else
+            answer += digit.toString()
+    return answer
+}
 
 /**
  * Средняя (3 балла)
@@ -265,7 +282,15 @@ fun convertToString(n: Int, base: Int): String = TODO()
  * из системы счисления с основанием base в десятичную.
  * Например: digits = (1, 3, 12), base = 14 -> 250
  */
-fun decimal(digits: List<Int>, base: Int): Int = TODO()
+fun decimal(digits: List<Int>, base: Int): Int {
+    var answer = 0
+    var currPow = 1
+    for (digit in digits.reversed()) {
+        answer += currPow * digit
+        currPow *= base
+    }
+    return answer
+}
 
 /**
  * Сложная (4 балла)
@@ -279,7 +304,16 @@ fun decimal(digits: List<Int>, base: Int): Int = TODO()
  * Использовать функции стандартной библиотеки, напрямую и полностью решающие данную задачу
  * (например, str.toInt(base)), запрещается.
  */
-fun decimalFromString(str: String, base: Int): Int = TODO()
+fun decimalFromString(str: String, base: Int): Int {
+    val listForDecimal = mutableListOf<Int>()
+    for (digit in str) {
+        listForDecimal += if (digit in (0..9).joinToString(""))
+            digit.toString().toInt()
+        else
+            (digit - 'a' + 10)
+    }
+    return decimal(listForDecimal, base)
+}
 
 /**
  * Сложная (5 баллов)
@@ -289,7 +323,24 @@ fun decimalFromString(str: String, base: Int): Int = TODO()
  * 90 = XC, 100 = C, 400 = CD, 500 = D, 900 = CM, 1000 = M.
  * Например: 23 = XXIII, 44 = XLIV, 100 = C
  */
-fun roman(n: Int): String = TODO()
+fun roman(n: Int): String = when {
+    n == 0 -> ""
+    n < 4 -> "I" + roman(n - 1)
+    n == 4 -> "IV"
+    n in 5..8 -> "V" + roman(n - 5)
+    n == 9 -> "IX"
+    n in 10..39 -> "X" + roman(n - 10)
+    n in 40..49 -> "XL" + roman(n - 40)
+    n in 50..89 -> "L" + roman(n - 50)
+    n in 90..99 -> "XC" + roman(n - 90)
+    n in 100..399 -> "C" + roman(n - 100)
+    n in 400..499 -> "CD" + roman(n - 400)
+    n in 500..900 -> "D" + roman(n - 500)
+    n in 900..999 -> "CM" + roman(n - 900)
+    n >= 1000 -> "M" + roman(n - 1000)
+    else -> "ERROR"
+
+}
 
 /**
  * Очень сложная (7 баллов)
