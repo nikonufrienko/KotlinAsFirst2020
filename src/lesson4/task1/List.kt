@@ -215,9 +215,11 @@ fun factorize(n: Int): List<Int> {
             if (divisor % prevDivisor == 0)
                 check = false
         if (check) {
-            answer.add(divisor)
-            if (n % sqr(divisor) == 0 && n != Int.MAX_VALUE)
+            var n2 = n
+            while (n2 % divisor == 0) {
                 answer.add(divisor)
+                n2 /= divisor
+            }
         }
     }
     return answer
