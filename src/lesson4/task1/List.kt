@@ -387,8 +387,8 @@ fun russian(n: Int): String = when(n) {
     in 1000..999999 -> when (n / 1000) {
         1 -> "одна тысяча " + russian(n - 1000)
         2 -> "две тысячи " + russian(n - 2000)
-        3 -> "три тысячи " + russian(n - 4000)
-        4 -> "четыре тысячи " + russian(n - 5000)
+        3 -> "три тысячи " + russian(n - 3000)
+        4 -> "четыре тысячи " + russian(n - 4000)
         in 5..19 -> russian(n / 1000) + " тысяч " + russian(n % 1000)
         in 20..99 -> russian((n / 10000) * 10) + " " + (if (n % 10000 < 1000) "тысяч " else "") + russian(n % 10000)
         in 100..999999 -> russian((n / 100000) * 100) + " " + (if (n % 100000 < 1000) "тысяч " else "") + russian(n % 100000)
