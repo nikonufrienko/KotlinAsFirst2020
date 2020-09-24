@@ -121,14 +121,14 @@ fun buildSumExample(list: List<Int>) = list.joinToString(separator = " + ", post
  * по формуле abs = sqrt(a1^2 + a2^2 + ... + aN^2).
  * Модуль пустого вектора считать равным 0.0.
  */
-fun abs(v: List<Double>): Double = TODO()
+fun abs(v: List<Double>): Double = v.toMutableList().map { it * it }.sum()
 
 /**
  * Простая (2 балла)
  *
  * Рассчитать среднее арифметическое элементов списка list. Вернуть 0.0, если список пуст
  */
-fun mean(list: List<Double>): Double = TODO()
+fun mean(list: List<Double>): Double = list.average()
 
 /**
  * Средняя (3 балла)
@@ -190,11 +190,8 @@ fun polynom(p: List<Int>, x: Int): Int {
  * Обратите внимание, что данная функция должна изменять содержание списка list, а не его копии.
  */
 fun accumulate(list: MutableList<Int>): MutableList<Int> {
-    var buff = 0
-    for (i in list.indices) {
-        buff += list[i]
-        list[i] = buff
-    }
+    for (i in 1 until list.size)
+        list[i] += list[i - 1]
     return list
 }
 
@@ -328,7 +325,7 @@ fun roman(n: Int): String = when {
     n < 4 -> "I" + roman(n - 1)
     n == 4 -> "IV"
     n in 5..8 -> "V" + roman(n - 5)
-    n == 9 -> "IX" 
+    n == 9 -> "IX"
     n in 10..39 -> "X" + roman(n - 10)
     n in 40..49 -> "XL" + roman(n - 40)
     n in 50..89 -> "L" + roman(n - 50)
@@ -348,7 +345,7 @@ fun roman(n: Int): String = when {
  * Например, 375 = "триста семьдесят пять",
  * 23964 = "двадцать три тысячи девятьсот шестьдесят четыре"
  */
-fun russian(n: Int): String = when(n) {
+fun russian(n: Int): String = when (n) {
     0 -> ""
     1 -> "один "
     2 -> "два "
@@ -398,7 +395,4 @@ fun russian(n: Int): String = when(n) {
     }
     else -> "ERROR"
 }.trim()
-fun main()
-{
-    print(russian(508))
-}
+
