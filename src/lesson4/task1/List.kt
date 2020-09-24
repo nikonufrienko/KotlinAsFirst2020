@@ -3,7 +3,6 @@
 package lesson4.task1
 
 import lesson1.task1.discriminant
-import lesson1.task1.sqr
 import kotlin.math.sqrt
 
 // Урок 4: списки
@@ -384,8 +383,8 @@ fun russian(n: Int): String = when (n) {
         3 -> "три тысячи " + russian(n - 3000)
         4 -> "четыре тысячи " + russian(n - 4000)
         in 5..19 -> russian(n / 1000) + " тысяч " + russian(n % 1000)
-        in 20..99 -> russian((n / 10000) * 10) + " " + (if (n % 10000 < 1000) "тысяч " else "") + russian(n % 10000)
-        in 100..999999 -> russian((n / 100000) * 100) + " " + (if (n % 100000 < 1000) "тысяч " else "") + russian(n % 100000)
+        in 20..99 -> russian((n / 10000) * 10) + (if (n % 10000 < 1000) " тысяч " else " ") + russian(n % 10000)
+        in 100..999999 -> russian((n / 100000) * 100) + (if (n % 100000 < 1000) " тысяч " else " ") + russian(n % 100000)
         else -> "ERROR"
     }
     else -> "ERROR"
