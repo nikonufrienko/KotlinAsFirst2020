@@ -120,7 +120,7 @@ fun buildSumExample(list: List<Int>) = list.joinToString(separator = " + ", post
  * по формуле abs = sqrt(a1^2 + a2^2 + ... + aN^2).
  * Модуль пустого вектора считать равным 0.0.
  */
-fun abs(v: List<Double>): Double = if (v.isEmpty()) 0.0 else sqrt(v.toMutableList().map { it * it }.sum())
+fun abs(v: List<Double>): Double = if (v.isEmpty()) 0.0 else sqrt(v.map { it * it }.sum())
 
 /**
  * Простая (2 балла)
@@ -138,8 +138,6 @@ fun mean(list: List<Double>): Double = if (list.isEmpty()) 0.0 else list.average
  * Обратите внимание, что данная функция должна изменять содержание списка list, а не его копии.
  */
 fun center(list: MutableList<Double>): MutableList<Double> {
-    if (list.isEmpty())
-        return list
     val decrement = mean(list)
     for (i in list.indices)
         list[i] -= decrement
@@ -198,21 +196,14 @@ fun accumulate(list: MutableList<Int>): MutableList<Int> {
  */
 fun factorize(n: Int): List<Int> {
     val answer = mutableListOf<Int>()
-    for (divisor in 2..n) {
-        if (n % divisor != 0)
-            continue
-        var check = true
-        for (prevDivisor in answer)
-            if (divisor % prevDivisor == 0)
-                check = false
-        if (check) {
-            var n2 = n
-            while (n2 % divisor == 0) {
-                answer.add(divisor)
-                n2 /= divisor
-            }
-        }
-    }
+    var n2 = n
+    var divisor = 2
+    while (divisor <= n2)
+        if (n2 % divisor == 0) {
+            n2 /= divisor
+            answer.add(divisor)
+        } else
+            divisor++
     return answer
 }
 
@@ -256,14 +247,14 @@ fun convert(n: Int, base: Int): List<Int> {
  * (например, n.toString(base) и подобные), запрещается.
  */
 fun convertToString(n: Int, base: Int): String {
-    var answer = ""
+    val answer = StringBuilder()
     val convertedToList = convert(n, base)
     for (digit in convertedToList)
         if (digit > 9)
-            answer += 'a' + digit - 10  //частенько юзал эту фичу в Си
+            answer.append('a' + digit - 10) //частенько юзал эту фичу в Си
         else
-            answer += digit.toString()
-    return answer
+            answer.append(digit.toString())
+    return answer.toString()
 }
 
 /**
@@ -384,7 +375,8 @@ fun russian(n: Int): String = when (n) {
         4 -> "четыре тысячи " + russian(n - 4000)
         in 5..19 -> russian(n / 1000) + " тысяч " + russian(n % 1000)
         in 20..99 -> russian((n / 10000) * 10) + (if (n % 10000 < 1000) " тысяч " else " ") + russian(n % 10000)
-        in 100..999999 -> russian((n / 100000) * 100) + (if (n % 100000 < 1000) " тысяч " else " ") + russian(n % 100000)
+        in 100..999999 -> russian((n / 100000) * 100) + (if (n % 100000 < 1000) " тысяч " else " ") +
+                russian(n % 100000)
         else -> "ERROR"
     }
     else -> "ERROR"
