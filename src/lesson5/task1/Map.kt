@@ -414,7 +414,8 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
                         check = true //был создан элемент
                         capacityMap[usedMass + mass] =
                             elements.first + element.first to elements.second + element.second
-                    } else if (element.first + elements.first > capacityMap[usedMass + mass]!!.first) {
+                    } else if (element.first + elements.first > capacityMap[usedMass + mass]!!.first
+                        && element.second !in elements.second) {
                         //если этот путь выгодней
                         check = true
                         capacityMap[usedMass + mass] =
