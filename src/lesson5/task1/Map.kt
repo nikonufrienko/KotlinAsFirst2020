@@ -3,8 +3,6 @@
 package lesson5.task1
 
 
-
-
 // Урок 5: ассоциативные массивы и множества
 // Максимальное количество баллов = 14
 // Рекомендуемое количество баллов = 9
@@ -247,7 +245,7 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
 fun canBuildFrom(chars: List<Char>, word: String): Boolean {
-    val lowerChars = chars.map { it.toString().toLowerCase().toCharArray()[0]}.toSet()
+    val lowerChars = chars.map { it.toString().toLowerCase().toCharArray()[0] }.toSet()
     for (char in word.toLowerCase())
         if (char !in lowerChars)
             return false
@@ -371,8 +369,13 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
     val set = list.toSet()
     for (i in list.indices)
-        if (list[i] <= number / 2 && number - list[i] in set)
+        if (list[i].toDouble() < number.toDouble() / 2 && number - list[i] in set)
             return i to list.indexOf(number - list[i])
+        else if (list[i] == number / 2 && number % 2 == 0 && list[i] in list.subList(0, i) + list.subList(
+                i + 1,
+                list.size
+            )
+        ) return list[i] to list[i]
     return -1 to -1
 }
 
