@@ -433,5 +433,5 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
         }
         capacityMap += newToCapacityMap
     }
-    return capacityMap[capacityMap.keys.maxOrNull()]!!.second.first
+    return capacityMap.maxByOrNull { it.value.first }!!.value.second.first
 }
