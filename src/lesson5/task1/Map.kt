@@ -431,7 +431,7 @@ fun bagPacking(
     availableTreasures: Map<String, Pair<Int, Int>>, freeCapacity: Int, usedTreasures: Map<String,
             Pair<Int, Int>> = mapOf()
 ): Set<String> {
-    val next = availableTreasures.minByOrNull { it.value.second / it.value.first }
+    val next = availableTreasures.maxByOrNull { it.value.second / it.value.first }
         ?: return usedTreasures.keys.toSet()
     return bagPacking(
         (availableTreasures - next.key).filter { it.value.first <= freeCapacity - next.value.first},
