@@ -332,8 +332,3 @@ fun fibSequenceDigit(n: Int): Int {
     }
     return buff % 10
 }
-
-fun main()
-{
-    println(isCoPrime(9483, 57443))
-}
