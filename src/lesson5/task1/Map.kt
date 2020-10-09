@@ -104,6 +104,7 @@ fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
             answerGrades[rating]!!.add(student)
         else
             answerGrades[rating] = mutableListOf(student)
+
     return answerGrades
 }
 
@@ -266,12 +267,10 @@ fun canBuildFrom(chars: List<Char>, word: String): Boolean {
  */
 fun extractRepeats(list: List<String>): Map<String, Int> {
     val result = mutableMapOf<String, Int>()
-    for (element in list.toSet()) {
-        val elementNumber = list.count { it == element }
-        if (elementNumber > 1)
-            result[element] = elementNumber
-    }
-    return result
+    for (element in list)
+        if (result[element] == null) result[element] = 1
+        else result[element] = result[element]!! + 1
+    return result.filter { it.value > 1 }
 }
 
 /**
@@ -397,53 +396,46 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
  *     450
  *   ) -> emptySet()
  */
-/*
-fun search(
-    treasures: List<Pair<String, Pair<Int, Int>>>,
-    usedTreasures: Set<Pair<String, Pair<Int, Int>>>,
-    capacity: Int,
-    value: Int,
-    leader: Set<Pair<String, Pair<Int, Int>>>,
-    leaderVal: Int
-): Pair<Int, Set<Pair<String, Pair<Int, Int>>>> {
-    var currentLeaderVal = leaderVal
-    var currentLeader = leader
-    for (i in treasures.indices) {
-        if (capacity - treasures[i].second.first >= 0) {
-            val res = search(
-                treasures.subList(i + 1, treasures.size),
-                usedTreasures + treasures[i],
-                capacity - treasures[i].second.first,
-                value + treasures[i].second.second,
-                currentLeader,
-                currentLeaderVal
-            )
-            if (res.first > currentLeaderVal) {
-                currentLeader = res.second
-                currentLeaderVal = res.first
-            }
-        }
-    }
-    return if (currentLeaderVal < value) value to usedTreasures
-    else currentLeaderVal to currentLeader
-}*/
-fun bagPacking(
-    availableTreasures: Map<String, Pair<Int, Int>>, freeCapacity: Int, usedTreasures: Map<String,
-            Pair<Int, Int>> = mapOf()
-): Set<String> {
-    val currAvailable = availableTreasures.filter { it.value.first <= freeCapacity }
-    val next = currAvailable.maxByOrNull { it.value.second / it.value.first }
-        ?: return usedTreasures.keys.toSet()
-    return bagPacking(
-        currAvailable - next.key,
-        freeCapacity - next.value.first, usedTreasures + next.toPair(),
-    )
-}
-/*
+
+
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
-    val treasuresList = treasures.toList().filter { it.second.first <= capacity }
-        .sortedBy { it.second.second.toFloat() / it.second.first }
-    return search(treasuresList, setOf(), capacity, 0, setOf(), -1).second.toMap().keys
+    val capacityMap = mutableMapOf<Int, Pair<Int, Set<String>>>()
+    // [масса] to ([цена множества] to [множество имён])
+    val massList = treasures.toList().map { it.second.first to (it.second.second to it.first) }.sortedBy { it.first }
+    // [масса] to ([цена]  to [имя])
+    var check = true
+    capacityMap[0] = 0 to setOf()
+    while (check) {
+        check = false
+        for ((usedMass, elements) in capacityMap)
+            for ((mass, element) in massList) {
+                if (usedMass + mass <= capacity)
+                    if (capacityMap[usedMass + mass] == null) {
+                        check = true //был создан элемент
+                        capacityMap[usedMass + mass] =
+                            elements.first + element.first to elements.second + element.second
+                    } else if (element.first + elements.first > capacityMap[usedMass + mass]!!.first) {
+                        //если этот путь выгодней
+                        check = true
+                        capacityMap[usedMass + mass] =
+                            elements.first + element.first to elements.second + element.second
+                    }
+            }
+    }
+    return capacityMap[capacityMap.keys.maxOrNull()]!!.second
+    /*
+    for (mass in 1 until capacity) //весьма логично что нулевая масса имеет нулевую стоимость так что её пропустим
+        for ((name, massAndValue) in treasures) {
+            val prevIndex = mass - massAndValue.first
+            val massOfTreasure = massAndValue.first
+            val valueOfTreasure = massAndValue.second
+            if (mass >= massOfTreasure //оно сюда влезает?
+                && listOfCapacity[prevIndex].first + valueOfTreasure > listOfCapacity[mass].first //оно того стоит?
+                && name !in listOfCapacity[prevIndex].second // этого сокровища ещё нет в рюкзаке?
+            )
+                listOfCapacity[mass] =
+                    (listOfCapacity[prevIndex].first + massAndValue.first) to (listOfCapacity[prevIndex].second + name)
+        }
+    return listOfCapacity[capacity].second*/
 
-
-}*/
+}
