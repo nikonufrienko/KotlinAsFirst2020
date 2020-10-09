@@ -409,13 +409,12 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
         check = false
         for ((usedMass, elements) in capacityMap)
             for ((mass, element) in massList) {
-                if (usedMass + mass <= capacity)
+                if (usedMass + mass <= capacity && element.second !in elements.second)
                     if (capacityMap[usedMass + mass] == null) {
                         check = true //был создан элемент
                         capacityMap[usedMass + mass] =
                             elements.first + element.first to elements.second + element.second
-                    } else if (element.first + elements.first > capacityMap[usedMass + mass]!!.first
-                        && element.second !in elements.second) {
+                    } else if (element.first + elements.first > capacityMap[usedMass + mass]!!.first) {
                         //если этот путь выгодней
                         check = true
                         capacityMap[usedMass + mass] =
