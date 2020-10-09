@@ -177,7 +177,7 @@ fun isCoPrime(m: Int, n: Int): Boolean {
         return true
     val a = maxOf(m, n)
     val b = minOf(m, n)
-    for (divisor in 2..sqrt(b.toDouble()).toInt()) {
+    for (divisor in 2..sqrt(a.toDouble()).toInt()) {
         if (a % divisor != 0)
             continue
         if (b % divisor == 0 || b % (a / divisor) == 0)
@@ -333,3 +333,7 @@ fun fibSequenceDigit(n: Int): Int {
     return buff % 10
 }
 
+fun main()
+{
+    println(isCoPrime(9483, 57443))
+}

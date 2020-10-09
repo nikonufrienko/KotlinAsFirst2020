@@ -426,7 +426,7 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
                     }
                 } else capacityMap[curCap] = value to (used to toUse - name)
             }
-            if(check)
+            if (check)
                 break
         }
     }
