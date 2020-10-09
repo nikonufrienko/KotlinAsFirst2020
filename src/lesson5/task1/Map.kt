@@ -412,6 +412,7 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
     while (check || check2) {
         check = false
         check2 = false
+        val newToCapacityMap = mutableMapOf<Int, Pair<Int, Pair<Set<String>, Set<String>>>>()
         for ((curCap, propertiesOfCurCap) in capacityMap) {
             val value = propertiesOfCurCap.first
             val used = propertiesOfCurCap.second.first
@@ -421,7 +422,7 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
                 val valueOfTreasure = (treasures[name] ?: error("Этого не должно было быть здесь")).second
                 if (mass + curCap <= capacity) {
                     if (capacityMap[mass + curCap] == null) {
-                        capacityMap[mass + curCap] = value + valueOfTreasure to (used + name to toUse - name)
+                        newToCapacityMap[mass + curCap] = value + valueOfTreasure to (used + name to toUse - name)
                         check = true
                     } else if (valueOfTreasure + value > capacityMap[mass + curCap]!!.first) {
                         capacityMap[mass + curCap] = value + valueOfTreasure to (used + name to toUse - name)
@@ -429,9 +430,8 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
                     }
                 } else capacityMap[curCap] = value to (used to toUse - name)
             }
-            if (check)
-                break
         }
+        capacityMap += newToCapacityMap
     }
     return capacityMap[capacityMap.keys.maxOrNull()]!!.second.first
 }
