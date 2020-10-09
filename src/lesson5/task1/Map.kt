@@ -407,7 +407,7 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
     capacityMap[0] = 0 to setOf()
     while (check) {
         check = false
-        for ((usedMass, elements) in capacityMap)
+        for ((usedMass, elements) in capacityMap) {
             for ((mass, element) in massList) {
                 if (usedMass + mass <= capacity && element.second !in elements.second)
                     if (capacityMap[usedMass + mass] == null) {
@@ -421,7 +421,12 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
                             elements.first + element.first to elements.second + element.second
                     }
             }
+            if (check) //произошло изменение карты цикл необходимо перезапустить
+                break
+        }
     }
+
+
     return capacityMap[capacityMap.keys.maxOrNull()]!!.second
     /*
     for (mass in 1 until capacity) //весьма логично что нулевая масса имеет нулевую стоимость так что её пропустим
