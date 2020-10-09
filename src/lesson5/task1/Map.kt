@@ -2,6 +2,9 @@
 
 package lesson5.task1
 
+import kotlinx.html.currentTimeMillis
+import kotlin.collections.setOf as setOf
+
 
 // Урок 5: ассоциативные массивы и множества
 // Максимальное количество баллов = 14
@@ -399,48 +402,33 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
 
 
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
-    val capacityMap = mutableMapOf<Int, Pair<Int, Set<String>>>()
-    // [масса] to ([цена множества] to [множество имён])
-    val massList = treasures.toList().map { it.second.first to (it.second.second to it.first) }.sortedBy { it.first }
+    val capacityMap = mutableMapOf<Int, Pair<Int, Pair<Set<String>, Set<String>>>>()
+    // key: [масса] value: ([цена множества] to [[множество использованных имён] to [множество возможных имен] ])
+    //val massList = treasures.toList().map { it.second.first to (it.second.second to it.first) }.sortedBy { it.first }
     // [масса] to ([цена]  to [имя])
+    capacityMap[0] = 0 to (setOf<String>() to treasures.keys.toSet())
     var check = true
-    capacityMap[0] = 0 to setOf()
     while (check) {
         check = false
-        for ((usedMass, elements) in capacityMap) {
-            for ((mass, element) in massList) {
-                if (usedMass + mass <= capacity && element.second !in elements.second)
-                    if (capacityMap[usedMass + mass] == null) {
-                        check = true //был создан элемент
-                        capacityMap[usedMass + mass] =
-                            elements.first + element.first to elements.second + element.second
-                    } else if (element.first + elements.first > capacityMap[usedMass + mass]!!.first) {
-                        //если этот путь выгодней
+        for ((curCap, propertiesOfCurCap) in capacityMap) {
+            val value = propertiesOfCurCap.first
+            val used = propertiesOfCurCap.second.first
+            val toUse = propertiesOfCurCap.second.second
+            for (name in toUse) {
+                val mass = (treasures[name] ?: error("Этого не должно было быть здесь")).first
+                val valueOfTreasure = (treasures[name] ?: error("Этого не должно было быть здесь")).second
+                if (mass + curCap <= capacity) {
+                    if (capacityMap[mass + curCap] == null
+                        || valueOfTreasure + value > capacityMap[mass + curCap]!!.first
+                    ) {
+                        capacityMap[mass + curCap] = value + valueOfTreasure to (used + name to toUse - name)
                         check = true
-                        capacityMap[usedMass + mass] =
-                            elements.first + element.first to elements.second + element.second
                     }
+                } else capacityMap[curCap] = value to (used to toUse - name)
             }
-            if (check) //произошло изменение карты цикл необходимо перезапустить
+            if(check)
                 break
         }
     }
-
-
-    return capacityMap[capacityMap.keys.maxOrNull()]!!.second
-    /*
-    for (mass in 1 until capacity) //весьма логично что нулевая масса имеет нулевую стоимость так что её пропустим
-        for ((name, massAndValue) in treasures) {
-            val prevIndex = mass - massAndValue.first
-            val massOfTreasure = massAndValue.first
-            val valueOfTreasure = massAndValue.second
-            if (mass >= massOfTreasure //оно сюда влезает?
-                && listOfCapacity[prevIndex].first + valueOfTreasure > listOfCapacity[mass].first //оно того стоит?
-                && name !in listOfCapacity[prevIndex].second // этого сокровища ещё нет в рюкзаке?
-            )
-                listOfCapacity[mass] =
-                    (listOfCapacity[prevIndex].first + massAndValue.first) to (listOfCapacity[prevIndex].second + name)
-        }
-    return listOfCapacity[capacity].second*/
-
+    return capacityMap[capacityMap.keys.maxOrNull()]!!.second.first
 }
