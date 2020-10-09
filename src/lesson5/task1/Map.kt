@@ -408,8 +408,10 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
     // [масса] to ([цена]  to [имя])
     capacityMap[0] = 0 to (setOf<String>() to treasures.keys.toSet())
     var check = true
-    while (check) {
+    var check2 = true
+    while (check || check2) {
         check = false
+        check2 = false
         for ((curCap, propertiesOfCurCap) in capacityMap) {
             val value = propertiesOfCurCap.first
             val used = propertiesOfCurCap.second.first
@@ -423,6 +425,7 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
                         check = true
                     } else if (valueOfTreasure + value > capacityMap[mass + curCap]!!.first) {
                         capacityMap[mass + curCap] = value + valueOfTreasure to (used + name to toUse - name)
+                        check2 = true
                     }
                 } else capacityMap[curCap] = value to (used to toUse - name)
             }
