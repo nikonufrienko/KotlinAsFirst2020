@@ -369,7 +369,7 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
     for (i in mapOfNumbers.keys.filter { it <= number / 2 }) {
         if (mapOfNumbers[number - i] != null
             && (i != number / 2 || number % 2 != 0 || (i == number / 2 && number % 2 == 0 && mapOfNumbers[i]!! > 1)))
-            return i to number - i
+            return list.indexOf(i) to list.indexOf(number - i)
     }
     return -1 to -1
 }

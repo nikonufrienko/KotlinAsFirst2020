@@ -317,7 +317,7 @@ fun roman(n: Int): String = when {
     n in 90..99 -> "XC" + roman(n - 90)
     n in 100..399 -> "C" + roman(n - 100)
     n in 400..499 -> "CD" + roman(n - 400)
-    n in 500..900 -> "D" + roman(n - 500)
+    n in 500..899 -> "D" + roman(n - 500)
     n in 900..999 -> "CM" + roman(n - 900)
     n >= 1000 -> "M" + roman(n - 1000)
     else -> "ERROR"
