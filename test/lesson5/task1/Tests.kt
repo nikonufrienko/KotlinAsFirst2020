@@ -335,12 +335,5 @@ class Tests {
                 450
             )
         )
-        assertEquals(
-            setOf<String>("1", "0"),
-            bagPacking(
-                mapOf("0" to (2 to 1), "1" to (1 to 1)),
-                3
-            )
-        )
     }
 }

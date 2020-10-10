@@ -122,8 +122,8 @@ fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
  *   containsIn(mapOf("a" to "z"), mapOf("a" to "zee", "b" to "sweet")) -> false
  */
 fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean {
-    for (pair in a.toList())
-        if (pair !in b.toList())
+    for ((key, value) in a)
+        if (b[key] != value)
             return false
     return true
 }
@@ -155,12 +155,7 @@ fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>) {
  * В выходном списке не должно быть повторяюихся элементов,
  * т. е. whoAreInBoth(listOf("Марат", "Семён, "Марат"), listOf("Марат", "Марат")) == listOf("Марат")
  */
-fun whoAreInBoth(a: List<String>, b: List<String>): List<String> {
-    val answer = mutableListOf<String>()
-    for (i in a)
-        if (i in b) answer += i
-    return answer.toSet().toList()
-}
+fun whoAreInBoth(a: List<String>, b: List<String>): List<String> = (a.toSet().intersect(b.toSet())).toList()
 
 /**
  * Средняя (3 балла)
@@ -183,7 +178,7 @@ fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<S
     val result = mapA.toMutableMap()
     for (key in mapB.keys)
         if (result[key] == null)
-            result[key] = mapB[key] ?: error("")
+            result[key] = mapB[key] ?: error("Этого не могло произойти, ведь на это была проверка")
         else if (result[key] != mapB[key])
             result[key] += ", " + mapB[key]
     return result
@@ -201,13 +196,12 @@ fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<S
  */
 fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Double> {
     val pricesAndNumber = mutableMapOf<String, Pair<Double, Int>>()
-    for ((stock, price) in stockPrices)
-        if (pricesAndNumber[stock] == null)
+    for ((stock, price) in stockPrices) {
+        val currPriceAndNumber = pricesAndNumber[stock]
+        if (currPriceAndNumber == null)
             pricesAndNumber[stock] = price to 1
-        else {
-            pricesAndNumber[stock] =
-                (pricesAndNumber[stock]?.first!! + price) to (pricesAndNumber[stock]?.second!! + 1)
-        }
+        else pricesAndNumber[stock] = (currPriceAndNumber.first + price) to (currPriceAndNumber.second + 1)
+    }
     return pricesAndNumber.mapValues { it.value.first / it.value.second }
 }
 
@@ -249,7 +243,7 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
 fun canBuildFrom(chars: List<Char>, word: String): Boolean {
-    val lowerChars = chars.map { it.toString().toLowerCase().toCharArray()[0] }.toSet()
+    val lowerChars = chars.map { it.toLowerCase() }.toSet()
     for (char in word.toLowerCase())
         if (char !in lowerChars)
             return false
@@ -289,10 +283,11 @@ fun extractRepeats(list: List<String>): Map<String, Int> {
  *   hasAnagrams(listOf("тор", "свет", "рот")) -> true
  */
 fun hasAnagrams(words: List<String>): Boolean {
-    for (i in words.indices)
-        for (j in i + 1 until words.size)
-            if (words[i].toSet() == words[j].toSet())
-                return true
+    val mapOfWords = mutableMapOf<Int, List<String>>()
+    words.forEach { mapOfWords[it.length] = mapOfWords[it.length]?.plus(it) ?: listOf(it) }
+    for (wordsOneLong in mapOfWords.values)
+        if (wordsOneLong.map { it.toCharArray().toSet() }.toSet().size != wordsOneLong.size)
+            return true
     return false
 }
 
@@ -369,12 +364,13 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
-    val set = list.toSet()
-    for (i in list.indices)
-        if (list[i].toDouble() < number.toDouble() / 2 && number - list[i] in set)
-            return i to list.indexOf(number - list[i])
-        else if (list[i] == number / 2 && number % 2 == 0 && list[i] in list.subList(i + 1, list.size))
-            return i to list.subList(i + 1, list.size).indexOf(list[i]) + i + 1
+    val mapOfNumbers = mutableMapOf<Int, Int>()
+    list.forEach { mapOfNumbers[it] = mapOfNumbers[it]?.plus(1) ?: 1 }
+    for (i in mapOfNumbers.keys.filter { it <= number / 2 }) {
+        if (mapOfNumbers[number - i] != null
+            && (i != number / 2 || number % 2 != 0 || (i == number / 2 && number % 2 == 0 && mapOfNumbers[i]!! > 1)))
+            return i to number - i
+    }
     return -1 to -1
 }
 
