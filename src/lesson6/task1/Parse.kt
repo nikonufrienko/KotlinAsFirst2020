@@ -2,6 +2,9 @@
 
 package lesson6.task1
 
+import lesson2.task2.daysInMonth
+import java.lang.NullPointerException
+
 // Урок 6: разбор строк, исключения
 // Максимальное количество баллов = 13
 // Рекомендуемое количество баллов = 11
@@ -175,7 +178,30 @@ fun mostExpensive(description: String): String = TODO()
  *
  * Вернуть -1, если roman не является корректным римским числом
  */
-fun fromRoman(roman: String): Int = TODO()
+fun fromRoman(roman: String): Int {
+    val digitMap = mapOf<String, Int>(
+        "I" to 1, "IV" to 4,
+        "V" to 5, "IX" to 9, "X" to 10, "XL" to 40, "L" to 50, "XC" to 90, "C" to 100, "CD" to 400, "D" to 500,
+        "CM" to 900, "M" to 1000
+    )
+    var i = 0
+    val listOfDigits = mutableListOf<Int>()
+    try {
+        while (i < roman.length) {
+            if (i < roman.length - 1 && roman.substring(i, i + 2) in digitMap.keys) {
+                listOfDigits.add(digitMap[roman.substring(i, i + 2)] ?: error("На это же была проверка выше"))
+                i += 2
+            } else {
+                listOfDigits.add(digitMap[roman.substring(i, i + 1)] ?: error("Неверный формат цифры"))
+                i++
+            }
+        }
+        for (index in 0..listOfDigits.size - 2) if (listOfDigits[index] < listOfDigits[index + 1]) return -1
+        return listOfDigits.sum()
+    } catch (e: IllegalStateException) {
+        return -1
+    }
+}
 
 /**
  * Очень сложная (7 баллов)
