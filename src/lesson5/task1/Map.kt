@@ -2,7 +2,6 @@
 
 package lesson5.task1
 
-import kotlinx.html.currentTimeMillis
 import kotlin.collections.setOf as setOf
 
 
@@ -365,7 +364,7 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
     for (i in mapOfNumbers.keys.filter { it <= number / 2 }) {
         if (i != number - i && mapOfNumbers[i] != null && mapOfNumbers[number - i] != null)
             return list.indexOf(i) to list.indexOf(number - i)
-        else if (i == number - i && (mapOfNumbers[i] ?: 0) > 2)
+        else if (i == number - i && (mapOfNumbers[i] ?: 0) > 1)
             return list.indexOf(i) to list.indexOfLast { it == i }
     }
     return -1 to -1
