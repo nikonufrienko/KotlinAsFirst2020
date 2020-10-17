@@ -262,7 +262,7 @@ fun extractRepeats(list: List<String>): Map<String, Int> {
     val result = mutableMapOf<String, Int>()
     for (element in list)
         if (result[element] == null) result[element] = 1
-        else result[element] = result[element]!! + 1
+        else result[element] = result[element]?.plus(1) ?: error("Непредвиденная ошибка в extractRepeats")
     return result.filter { it.value > 1 }
 }
 
@@ -282,7 +282,7 @@ fun hasAnagrams(words: List<String>): Boolean {
     val mapOfWords = mutableMapOf<Int, List<String>>()
     words.forEach { mapOfWords[it.length] = mapOfWords[it.length]?.plus(it) ?: listOf(it) }
     for (wordsOneLong in mapOfWords.values)
-        if (wordsOneLong.map { it.toCharArray().toSet() }.toSet().size != wordsOneLong.size)
+        if (wordsOneLong.map { it.toSet() }.toSet().size != wordsOneLong.size)
             return true
     return false
 }
@@ -363,9 +363,10 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
     val mapOfNumbers = mutableMapOf<Int, Int>()
     list.forEach { mapOfNumbers[it] = mapOfNumbers[it]?.plus(1) ?: 1 }
     for (i in mapOfNumbers.keys.filter { it <= number / 2 }) {
-        if (mapOfNumbers[number - i] != null
-            && (i != number / 2 || number % 2 != 0 || (i == number / 2 && number % 2 == 0 && mapOfNumbers[i]!! > 1)))
-            return list.indexOf(i) to list.indexOf(number - i)
+        if (i != number - i && mapOfNumbers[i] != null && mapOfNumbers[number - i] != null)
+            return i to number - i
+        else if (i == number - i && i > 2)
+            return i to i
     }
     return -1 to -1
 }
@@ -408,8 +409,9 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
             val used = propertiesOfCurCap.second.first
             val toUse = propertiesOfCurCap.second.second
             for (name in toUse) {
-                val mass = (treasures[name] ?: error("Этого не должно было быть здесь")).first
-                val valueOfTreasure = (treasures[name] ?: error("Этого не должно было быть здесь")).second
+                val treasure = treasures[name] ?: error("Этого не должно было быть здесь")
+                val mass = treasure.first
+                val valueOfTreasure = treasure.second
                 if (mass + curCap <= capacity) {
                     if (capacityMap[mass + curCap] == null) {
                         newToCapacityMap[mass + curCap] = value + valueOfTreasure to (used + name to toUse - name)
