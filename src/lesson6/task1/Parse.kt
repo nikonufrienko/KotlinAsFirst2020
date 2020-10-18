@@ -2,9 +2,6 @@
 
 package lesson6.task1
 
-import lesson2.task2.daysInMonth
-import java.lang.NullPointerException
-
 // Урок 6: разбор строк, исключения
 // Максимальное количество баллов = 13
 // Рекомендуемое количество баллов = 11
@@ -179,7 +176,7 @@ fun mostExpensive(description: String): String = TODO()
  * Вернуть -1, если roman не является корректным римским числом
  */
 fun fromRoman(roman: String): Int {
-    val digitMap = mapOf<String, Int>(
+    val digitMap = mapOf(
         "I" to 1, "IV" to 4,
         "V" to 5, "IX" to 9, "X" to 10, "XL" to 40, "L" to 50, "XC" to 90, "C" to 100, "CD" to 400, "D" to 500,
         "CM" to 900, "M" to 1000
@@ -239,4 +236,79 @@ fun fromRoman(roman: String): Int {
  * IllegalArgumentException должен бросаться даже если ошибочная команда не была достигнута в ходе выполнения.
  *
  */
-fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> = TODO()
+fun doTheseCommands(
+    listOfCells: MutableList<Int>, commands: String, currentPosition_Valuable: Int,
+    currentLimit_Valuable: Int
+): Pair<Int, Int> {
+    var index = 0
+    var currentLimit = currentLimit_Valuable
+    var currentPosition = currentPosition_Valuable
+    while (index < commands.length && currentLimit > 0) {
+        val exceptLimit = IllegalStateException("Произошёл выход за границу конвейера")
+        when (commands[index]) {
+            '+' -> {
+                listOfCells[currentPosition] += 1
+                currentLimit--
+            }
+            '-' -> {
+                listOfCells[currentPosition] -= 1
+                currentLimit--
+            }
+            ' ' -> currentLimit--
+            '>' -> if (currentPosition < listOfCells.size - 1) {
+                currentPosition++
+                currentLimit--
+            } else throw exceptLimit
+            '<' -> if (currentPosition > 0) {
+                currentPosition--
+                currentLimit--
+            } else throw exceptLimit
+            '[' -> {
+                currentLimit -= 1
+                val startPoint = index + 1
+                var counter = 1
+                while (counter != 0) {
+                    index++
+                    //можно не обрабатывать выход за границу строки комманд тк была проверка на парность [ и ]
+                    if (currentLimit == 0)
+                        break
+                    if (commands[index] == '[')
+                        counter++
+                    else if (commands[index] == ']')
+                        counter--
+                }
+                val endPoint = index
+                while (listOfCells[currentPosition] != 0 && currentLimit > 0) {
+                    val (newCurrLim, newCurrPos) = doTheseCommands(
+                        listOfCells,
+                        commands.substring(startPoint, endPoint), currentPosition, currentLimit
+                    )
+                    currentLimit = newCurrLim
+                    currentPosition = newCurrPos
+                    currentLimit -= 1 //была выполнена комманда ]
+                }
+            }
+        }
+        index++
+    }
+
+    return currentLimit to currentPosition
+}
+
+fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
+    val listOfCells = MutableList(cells) { 0 }
+    val currentPosition = cells / 2//индекс текущей ячёки
+    //###################### Провека на корректность ##############################
+    val setOfCorrectCmd = setOf('[', ']', '<', '>', '+', '-', ' ')
+    var checkCounter = 0
+    for (i in commands) {
+        if (i !in setOfCorrectCmd) throw IllegalArgumentException("Неверная комманда")
+        if (i == '[') checkCounter++
+        else if (i == ']') checkCounter--
+        if (checkCounter < 0) throw IllegalArgumentException("перед ] не было [")
+    }
+    if (checkCounter != 0) throw IllegalArgumentException("Имеются не парные скобки")
+    //#############################################################################
+    doTheseCommands(listOfCells, commands, currentPosition, limit)
+    return listOfCells
+}
