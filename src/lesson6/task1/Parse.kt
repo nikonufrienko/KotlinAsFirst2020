@@ -297,7 +297,7 @@ fun doTheseCommands(
 
 fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
     val listOfCells = MutableList(cells) { 0 }
-    val currentPosition = cells / 2//индекс текущей ячёки
+    val currentPosition = cells / 2 //индекс текущей ячёки
     //###################### Провека на корректность ##############################
     val setOfCorrectCmd = setOf('[', ']', '<', '>', '+', '-', ' ')
     var checkCounter = 0
