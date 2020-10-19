@@ -176,6 +176,7 @@ fun mostExpensive(description: String): String = TODO()
  * Вернуть -1, если roman не является корректным римским числом
  */
 fun fromRoman(roman: String): Int {
+    if(roman.isEmpty()) return -1
     val digitMap = mapOf(
         "I" to 1, "IV" to 4,
         "V" to 5, "IX" to 9, "X" to 10, "XL" to 40, "L" to 50, "XC" to 90, "C" to 100, "CD" to 400, "D" to 500,
