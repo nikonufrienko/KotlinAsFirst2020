@@ -359,13 +359,14 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
-    val mapOfNumbers = mutableMapOf<Int, Int>()
-    list.forEach { mapOfNumbers[it] = mapOfNumbers[it]?.plus(1) ?: 1 }
+    val mapOfNumbers = mutableMapOf<Int, List<Int>>()
+    val err = "Ошибка которая всё равно никогда не произойдёт"
+    list.forEachIndexed { index, value -> mapOfNumbers[value] = mapOfNumbers[value]?.plus(index) ?: listOf(index) }
     for (i in mapOfNumbers.keys.filter { it <= number / 2 }) {
         if (i != number - i && mapOfNumbers[i] != null && mapOfNumbers[number - i] != null)
-            return list.indexOf(i) to list.indexOf(number - i)
-        else if (i == number - i && (mapOfNumbers[i] ?: 0) > 1)
-            return list.indexOf(i) to list.indexOfLast { it == i }
+            return (mapOfNumbers[i]?.get(0) ?: error(err)) to (mapOfNumbers[number - i]?.get(0) ?: error(err))
+        else if (i == number - i && (mapOfNumbers[i]?.size ?: 0) > 1)
+            return (mapOfNumbers[i]?.get(0) ?: error(err)) to (mapOfNumbers[i]?.get(1) ?: error(err))
     }
     return -1 to -1
 }
@@ -415,7 +416,9 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
                     if (capacityMap[mass + curCap] == null) {
                         newToCapacityMap[mass + curCap] = value + valueOfTreasure to (used + name to toUse - name)
                         check = true
-                    } else if (valueOfTreasure + value > capacityMap[mass + curCap]!!.first) {
+                    } else if (valueOfTreasure + value
+                        > capacityMap[mass + curCap]?.first ?: error("Ошибка которая всё равно никогда не произойдёт")
+                    ) {
                         capacityMap[mass + curCap] = value + valueOfTreasure to (used + name to toUse - name)
                         check = true
                     }
