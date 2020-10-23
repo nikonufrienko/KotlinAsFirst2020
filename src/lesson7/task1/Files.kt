@@ -2,6 +2,9 @@
 
 package lesson7.task1
 
+import kotlinx.html.attributes.stringSetDecode
+import lesson3.task1.digitNumber
+import lesson6.task1.firstDuplicateIndex
 import java.io.File
 
 // Урок 7: работа с файлами
@@ -427,6 +430,11 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
     TODO()
 }
 
+fun Int.pow(n: Int): Int {
+    var answer = 1
+    for (i in 0 until n) answer *= this
+    return answer
+}
 
 /**
  * Сложная (25 баллов)
@@ -448,7 +456,59 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
  * Используемые пробелы, отступы и дефисы должны в точности соответствовать примеру.
  *
  */
+
 fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
-    TODO()
+    var lhvVariable = lhv
+    val numberOFAllDigits = digitNumber(lhv)
+    var currRank = 10.pow(numberOFAllDigits)
+    var currRankNumber = numberOFAllDigits
+    val builder = StringBuilder()
+    val getDashes = { n: Int -> String(CharArray(n) { '-' }) }
+    var firstCheck = false
+    builder.append(' ', lhv, " | ", rhv, '\n')
+    while (true) {
+        if (currRank >= 10) {
+            currRank /= 10
+            currRankNumber--
+        } else break
+        val deductible =
+            if (lhvVariable / currRank >= rhv) (((lhvVariable / currRank) / rhv) * rhv) * currRank
+            else 0
+        lhvVariable -= deductible
+        if (deductible != 0 || firstCheck || currRankNumber == 0) {
+            val lenOfDeduct = digitNumber(deductible / currRank)
+            builder.append(
+                String.format(
+                    "%" + (numberOFAllDigits - currRankNumber + 1).toString() + "S",
+                    "-" + (deductible / currRank).toString(),
+                ),
+                if (!firstCheck)
+                    String.format(
+                        "%" + (currRankNumber + 3).toString() + "S",
+                        " ",
+                    ) + (lhv / rhv).toString()
+                else "",
+                '\n',
+            )
+            builder.append(
+                String.format(
+                    "%" + (numberOFAllDigits + 1 - currRankNumber).toString() + "S",
+                    getDashes(lenOfDeduct + 1)
+                ), '\n'
+            )
+            builder.append(
+                String.format(
+                    "%" + (numberOFAllDigits + 1 - currRankNumber + if (currRank >= 10) 1 else 0).toString() + "s",
+                    (if (currRank >= 10) String.format("%02d", (lhvVariable / (currRank / 10)))
+                    else (lhvVariable / currRank).toString())
+                ), '\n'
+            )
+            firstCheck = true
+        }
+    }
+    val output = builder.toString()
+    val writer = File(outputName).writer()
+    writer.write(output)
+    writer.close()
 }
 
