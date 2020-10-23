@@ -476,7 +476,6 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
             else 0
         lhvVariable -= deductible
         if (deductible != 0 || firstCheck || currRankNumber == 0) {
-            val lenOfDeduct = digitNumber(deductible / currRank)
             builder.append(
                 String.format(
                     "%" + (numberOFAllDigits - currRankNumber + 1).toString() + "S",
@@ -493,7 +492,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
             builder.append(
                 String.format(
                     "%" + (numberOFAllDigits + 1 - currRankNumber).toString() + "S",
-                    getDashes(lenOfDeduct + 1)
+                    getDashes(maxOf(digitNumber(lhvVariable / currRank), digitNumber(deductible / currRank) +1))
                 ), '\n'
             )
             builder.append(
@@ -511,4 +510,3 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     writer.write(output)
     writer.close()
 }
-
