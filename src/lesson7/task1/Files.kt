@@ -465,7 +465,9 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     val builder = StringBuilder()
     val getDashes = { n: Int -> String(CharArray(n) { '-' }) }
     var firstCheck = false
-    builder.append(' ', lhv, " | ", rhv, '\n')
+    val checkForSpace = digitNumber(lhv) == digitNumber((lhv / rhv) * rhv)
+    val additionSpace = if (checkForSpace) 1 else 0
+    builder.append(if (checkForSpace) " " else "", lhv, " | ", rhv, '\n')
     while (true) {
         if (currRank >= 10) {
             currRank /= 10
@@ -476,9 +478,10 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
             else 0
         lhvVariable -= deductible
         if (deductible != 0 || firstCheck || currRankNumber == 0) {
+            val spacesNumber = (numberOFAllDigits - currRankNumber + additionSpace).toString()
             builder.append(
                 String.format(
-                    "%" + (numberOFAllDigits - currRankNumber + 1).toString() + "S",
+                    "%" + spacesNumber + "S",
                     "-" + (deductible / currRank).toString(),
                 ),
                 if (!firstCheck)
@@ -491,13 +494,16 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
             )
             builder.append(
                 String.format(
-                    "%" + (numberOFAllDigits + 1 - currRankNumber).toString() + "S",
-                    getDashes(maxOf(digitNumber(lhvVariable / currRank), digitNumber(deductible / currRank) +1))
+                    "%" + spacesNumber + "S",
+                    getDashes(
+                        maxOf(digitNumber(lhvVariable / currRank), digitNumber(deductible / currRank) + 1)
+                    )
                 ), '\n'
             )
             builder.append(
                 String.format(
-                    "%" + (numberOFAllDigits + 1 - currRankNumber + if (currRank >= 10) 1 else 0).toString() + "s",
+                    "%" + (numberOFAllDigits + additionSpace - currRankNumber
+                            + if (currRank >= 10) 1 else 0).toString() + "s",
                     (if (currRank >= 10) String.format("%02d", (lhvVariable / (currRank / 10)))
                     else (lhvVariable / currRank).toString())
                 ), '\n'
