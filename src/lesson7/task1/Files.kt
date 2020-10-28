@@ -464,6 +464,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     var currRankNumber = numberOFAllDigits
     val builder = StringBuilder()
     val getDashes = { n: Int -> String(CharArray(n) { '-' }) }
+    val formatStr = { n: Int, str: String -> String(CharArray(n - str.length) { ' ' }) + str }
     var firstCheck = false
     val checkForSpace = digitNumber(lhv) == digitNumber((lhv / rhv) * rhv)
     val additionSpace = if (checkForSpace) 1 else 0
@@ -478,35 +479,25 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
             else 0
         lhvVariable -= deductible
         if (deductible != 0 || firstCheck || currRankNumber == 0) {
-            val spacesNumber = (numberOFAllDigits - currRankNumber + additionSpace).toString()
+            val spacesNumber = numberOFAllDigits - currRankNumber + additionSpace
             builder.append(
-                String.format(
-                    "%" + spacesNumber + "S",
-                    "-" + (deductible / currRank).toString(),
-                ),
+                formatStr(spacesNumber, "-" + (deductible / currRank).toString()),
                 if (!firstCheck)
-                    String.format(
-                        "%" + (currRankNumber + 3).toString() + "S",
-                        " ",
-                    ) + (lhv / rhv).toString()
+                    formatStr(currRankNumber + 3, " ") + (lhv / rhv).toString()
                 else "",
-                '\n',
+                '\n'
             )
             builder.append(
-                String.format(
-                    "%" + spacesNumber + "S",
-                    getDashes(
-                        maxOf(digitNumber(lhvVariable / currRank), digitNumber(deductible / currRank) + 1)
-                    )
-                ), '\n'
+                formatStr(
+                    spacesNumber, getDashes(
+                        maxOf(digitNumber(lhvVariable / currRank), digitNumber(deductible / currRank) + 1))),
+                '\n'
             )
             builder.append(
-                String.format(
-                    "%" + (numberOFAllDigits + additionSpace - currRankNumber
-                            + if (currRank >= 10) 1 else 0).toString() + "s",
+                formatStr(numberOFAllDigits + additionSpace - currRankNumber + if (currRank >= 10) 1 else 0,
                     (if (currRank >= 10) String.format("%02d", (lhvVariable / (currRank / 10)))
-                    else (lhvVariable / currRank).toString())
-                ), '\n'
+                    else (lhvVariable / currRank).toString())),
+                '\n'
             )
             firstCheck = true
         }
