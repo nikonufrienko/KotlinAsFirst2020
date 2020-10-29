@@ -334,7 +334,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
 * Помидоры
 * Фрукты
     1. Бананы
-    23. Яблоки
+    2. Яблоки
         1. Красные
         2. Зелёные
 ///////////////////////////////конец файла//////////////////////////////////////////////////////////////////////////////
@@ -385,8 +385,74 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
 ///////////////////////////////конец файла//////////////////////////////////////////////////////////////////////////////
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
+
 fun markdownToHtmlLists(inputName: String, outputName: String) {
-    TODO()
+    class Paragraph(type_: Int, rank_: Int, line_: String) {
+        val type = type_
+        val level = rank_ / 4
+        val line = line_
+    }
+
+    fun whatIsThisLine(line: String): Paragraph {
+        var checkForNumber = false
+        var rank = 0
+        for (i in line.indices)
+            when (line[i]) {
+                '*' -> return Paragraph(2, i, line.substring(i + 2))
+                ' ' -> continue
+                in ('0'..'9') -> {
+                    if (!checkForNumber) {
+                        rank = i
+                        checkForNumber = true
+                    }
+                }
+                '.' -> if (checkForNumber) return Paragraph(1, rank, line.substring(i + 2)) else
+                    return Paragraph(0, 0, line)
+            }
+        return Paragraph(0, 0, line)
+    }
+
+    val str = File(inputName).readText()
+    val writer = File(outputName).writer()
+    writer.append("<html><body><p>")
+    val strSplited = str.split('\n')
+    val paragraphs = strSplited.map { whatIsThisLine(it) }
+    var currLevel = -1
+    val listForClose = mutableListOf<String>()
+    var currType = 0
+    for (i in paragraphs.indices) {
+        if (currLevel == paragraphs[i].level)
+            writer.append(listForClose.removeLast())
+        if (paragraphs[i].level > currLevel)
+            when (paragraphs[i].type) {
+                1 -> {
+                    writer.append("<ol>\n")
+                    listForClose.add("</ol>\n")
+                }
+                2 -> {
+                    writer.append("<ul>\n")
+                    listForClose.add("</ul>\n")
+
+                }
+            }
+        else if (paragraphs[i].level < currLevel)
+            for (j in 0 until currLevel - paragraphs[i].level + 2) writer.append(listForClose.removeLast())
+        else if (currType != paragraphs[i].type && currType != 0)
+            writer.append(listForClose.removeLast())
+        if (paragraphs[i].type != 0) {
+            currType = paragraphs[i].type
+            currLevel = paragraphs[i].level
+            writer.append("<li>" + paragraphs[i].line)
+            listForClose.add("</li>\n")
+        }
+    }
+    for (i in listForClose.indices) writer.append(listForClose.removeLast()) // закрываем все не закрытые теги
+    writer.append("</p></body></html>")
+    writer.close()
+}
+fun main()
+{
+    markdownToHtmlLists("","")
 }
 
 /**
