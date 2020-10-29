@@ -387,18 +387,13 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
  */
 
 fun markdownToHtmlLists(inputName: String, outputName: String) {
-    class Paragraph(type_: Int, rank_: Int, line_: String) {
-        val type = type_
-        val level = rank_ / 4
-        val line = line_
-    }
-
+    data class Paragraph(val type: Int, val level: Int, val line: String)
     fun whatIsThisLine(line: String): Paragraph {
         var checkForNumber = false
         var rank = 0
         for (i in line.indices)
             when (line[i]) {
-                '*' -> return Paragraph(2, i, line.substring(i + 2))
+                '*' -> return Paragraph(2, i / 4, line.substring(i + 2))
                 ' ' -> continue
                 in ('0'..'9') -> {
                     if (!checkForNumber) {
@@ -406,7 +401,7 @@ fun markdownToHtmlLists(inputName: String, outputName: String) {
                         checkForNumber = true
                     }
                 }
-                '.' -> if (checkForNumber) return Paragraph(1, rank, line.substring(i + 2)) else
+                '.' -> if (checkForNumber) return Paragraph(1, rank / 4, line.substring(i + 2)) else
                     return Paragraph(0, 0, line)
             }
         return Paragraph(0, 0, line)
