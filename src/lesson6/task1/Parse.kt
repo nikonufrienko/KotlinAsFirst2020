@@ -184,22 +184,19 @@ fun fromRoman(roman: String): Int {
     )
     var i = 0
     val listOfDigits = mutableListOf<Int>()
-    try {
-        while (i < roman.length) {
-            if (i < roman.length - 1 && roman.substring(i, i + 2) in digitMap.keys) {
-                listOfDigits.add(digitMap[roman.substring(i, i + 2)] ?: error("На это же была проверка выше"))
-                i += 2
-            } else {
-                listOfDigits.add(digitMap[roman.substring(i, i + 1)] ?: error("Неверный формат цифры"))
-                i++
-            }
-        }
-        for (index in 0..listOfDigits.size - 2) if (listOfDigits[index] < listOfDigits[index + 1]) return -1
-        return listOfDigits.sum()
-    } catch (e: IllegalStateException) {
-        return -1
+    while (i < roman.length) {
+        if (i < roman.length - 1 && roman.substring(i, i + 2) in digitMap.keys) {
+            listOfDigits.add(digitMap[roman.substring(i, i + 2)] ?: return -1)
+            i += 2
+        } else {
+            listOfDigits.add(digitMap[roman.substring(i, i + 1)] ?: return -1)
+            i++
+        } //здесь невозможно вынести это в переменную тк есть дополнительная проверка
     }
+    for (index in 0..listOfDigits.size - 2) if (listOfDigits[index] < listOfDigits[index + 1]) return -1
+    return listOfDigits.sum()
 }
+
 
 /**
  * Очень сложная (7 баллов)
@@ -237,15 +234,24 @@ fun fromRoman(roman: String): Int {
  * IllegalArgumentException должен бросаться даже если ошибочная команда не была достигнута в ходе выполнения.
  *
  */
-fun doTheseCommands(
-    listOfCells: MutableList<Int>, commands: String, currentPosition_Valuable: Int,
-    currentLimit_Valuable: Int
-): Pair<Int, Int> {
+fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
+    val listOfCells = MutableList(cells) { 0 }
+    //###################### Провека на корректность ###############################
+    val setOfCorrectCmd = setOf('[', ']', '<', '>', '+', '-', ' ')
+    var checkCounter = 0
+    for (i in commands) {
+        if (i !in setOfCorrectCmd) throw IllegalArgumentException("Неверная комманда")
+        if (i == '[') checkCounter++
+        else if (i == ']') checkCounter--
+        if (checkCounter < 0) throw IllegalArgumentException("перед ] не было [")
+    }
+    if (checkCounter != 0) throw IllegalArgumentException("Имеются не парные скобки")
+    //##############################################################################
+    var currentPosition = cells / 2 //индекс текущей ячёки
     var index = 0
-    var currentLimit = currentLimit_Valuable
-    var currentPosition = currentPosition_Valuable
+    var currentLimit = limit
+    val indicesForJumps = mutableListOf<Int>()
     while (index < commands.length && currentLimit > 0) {
-        val exceptLimit = IllegalStateException("Произошёл выход за границу конвейера")
         when (commands[index]) {
             '+' -> {
                 listOfCells[currentPosition] += 1
@@ -259,57 +265,30 @@ fun doTheseCommands(
             '>' -> if (currentPosition < listOfCells.size - 1) {
                 currentPosition++
                 currentLimit--
-            } else throw exceptLimit
+            } else throw IllegalStateException("Произошёл выход за границу конвейера")
             '<' -> if (currentPosition > 0) {
                 currentPosition--
                 currentLimit--
-            } else throw exceptLimit
+            } else throw IllegalStateException("Произошёл выход за границу конвейера")
+            ']' -> {
+                currentLimit--
+                if (listOfCells[currentPosition] != 0)
+                    index = indicesForJumps.last()
+                else indicesForJumps.removeLast()
+                index++
+                continue
+            }
             '[' -> {
-                currentLimit -= 1
-                val startPoint = index + 1
-                var counter = 1
-                while (counter != 0) {
-                    index++
-                    //можно не обрабатывать выход за границу строки комманд тк была проверка на парность [ и ]
-                    if (currentLimit == 0)
-                        break
-                    if (commands[index] == '[')
-                        counter++
-                    else if (commands[index] == ']')
-                        counter--
-                }
-                val endPoint = index
-                while (listOfCells[currentPosition] != 0 && currentLimit > 0) {
-                    val (newCurrLim, newCurrPos) = doTheseCommands(
-                        listOfCells,
-                        commands.substring(startPoint, endPoint), currentPosition, currentLimit
-                    )
-                    currentLimit = newCurrLim
-                    currentPosition = newCurrPos
-                    currentLimit -= 1 //была выполнена комманда ]
-                }
+                currentLimit--
+                if (listOfCells[currentPosition] == 0)
+                    while (commands[index] != ']') index++
+                else {
+                    indicesForJumps.add(index)}
+                index++
+                continue
             }
         }
         index++
     }
-
-    return currentLimit to currentPosition
-}
-
-fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
-    val listOfCells = MutableList(cells) { 0 }
-    val currentPosition = cells / 2 //индекс текущей ячёки
-    //###################### Провека на корректность ##############################
-    val setOfCorrectCmd = setOf('[', ']', '<', '>', '+', '-', ' ')
-    var checkCounter = 0
-    for (i in commands) {
-        if (i !in setOfCorrectCmd) throw IllegalArgumentException("Неверная комманда")
-        if (i == '[') checkCounter++
-        else if (i == ']') checkCounter--
-        if (checkCounter < 0) throw IllegalArgumentException("перед ] не было [")
-    }
-    if (checkCounter != 0) throw IllegalArgumentException("Имеются не парные скобки")
-    //#############################################################################
-    doTheseCommands(listOfCells, commands, currentPosition, limit)
     return listOfCells
 }

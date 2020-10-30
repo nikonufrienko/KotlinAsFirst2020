@@ -542,7 +542,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         if (deductible != 0 || firstCheck || currRankNumber == 0) {
             val spacesNumber = numberOFAllDigits - currRankNumber + additionSpace
             builder.append(
-                formatStr(spacesNumber, "-" + (deductible / currRank).toString()),
+                formatStr(spacesNumber, "-${deductible / currRank}"),
                 if (!firstCheck)
                     formatStr(currRankNumber + 3, " ") + (lhv / rhv).toString()
                 else "",
