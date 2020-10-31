@@ -2,6 +2,8 @@
 
 package lesson6.task1
 
+import org.junit.Assert
+
 // Урок 6: разбор строк, исключения
 // Максимальное количество баллов = 13
 // Рекомендуемое количество баллов = 11
@@ -46,7 +48,7 @@ fun timeSecondsToStr(seconds: Int): String {
 
 /**
  * Пример: консольный ввод
- */
+ *//*
 fun main() {
     println("Введите время в формате ЧЧ:ММ:СС")
     val line = readLine()
@@ -60,7 +62,7 @@ fun main() {
     } else {
         println("Достигнут <конец файла> в процессе чтения строки. Программа прервана")
     }
-}
+}*/
 
 
 /**
@@ -235,7 +237,6 @@ fun fromRoman(roman: String): Int {
  *
  */
 fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
-    val listOfCells = MutableList(cells) { 0 }
     //###################### Провека на корректность ###############################
     val setOfCorrectCmd = setOf('[', ']', '<', '>', '+', '-', ' ')
     var checkCounter = 0
@@ -247,6 +248,7 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
     }
     if (checkCounter != 0) throw IllegalArgumentException("Имеются не парные скобки")
     //##############################################################################
+    val listOfCells = MutableList(cells) { 0 }
     var currentPosition = cells / 2 //индекс текущей ячёки
     var index = 0
     var currentLimit = limit
@@ -275,17 +277,20 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
                 if (listOfCells[currentPosition] != 0)
                     index = indicesForJumps.last()
                 else indicesForJumps.removeLast()
-                index++
-                continue
             }
             '[' -> {
                 currentLimit--
-                if (listOfCells[currentPosition] == 0)
-                    while (commands[index] != ']') index++
-                else {
-                    indicesForJumps.add(index)}
-                index++
-                continue
+                if (listOfCells[currentPosition] == 0) {
+                    var counterForClose = 1
+                    while (counterForClose != 0) {
+                        index++
+                        if (commands[index] == ']')
+                            counterForClose--
+                        if (commands[index] == '[')
+                            counterForClose++
+                    }
+                } else
+                    indicesForJumps.add(index)
             }
         }
         index++
