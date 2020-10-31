@@ -237,7 +237,6 @@ fun fromRoman(roman: String): Int {
  *
  */
 fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
-    //###################### Провека на корректность ###############################
     val setOfCorrectCmd = setOf('[', ']', '<', '>', '+', '-', ' ')
     var checkCounter = 0
     for (i in commands) {
@@ -247,7 +246,6 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
         if (checkCounter < 0) throw IllegalArgumentException("перед ] не было [")
     }
     if (checkCounter != 0) throw IllegalArgumentException("Имеются не парные скобки")
-    //##############################################################################
     val listOfCells = MutableList(cells) { 0 }
     var currentPosition = cells / 2 //индекс текущей ячёки
     var index = 0

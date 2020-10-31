@@ -388,6 +388,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
 
 fun markdownToHtmlLists(inputName: String, outputName: String) {
     data class Paragraph(val type: Int, val level: Int, val line: String)
+
     fun whatIsThisLine(line: String): Paragraph {
         var checkForNumber = false
         var rank = 0
@@ -407,19 +408,18 @@ fun markdownToHtmlLists(inputName: String, outputName: String) {
         return Paragraph(0, 0, line)
     }
 
-    val str = File(inputName).readText()
     val writer = File(outputName).writer()
     writer.append("<html><body><p>")
-    val strSplited = str.split('\n')
+    val strSplited = File(inputName).readLines()
     val paragraphs = strSplited.map { whatIsThisLine(it) }
     var currLevel = -1
     val listForClose = mutableListOf<String>()
     var currType = 0
-    for (i in paragraphs.indices) {
-        if (currLevel == paragraphs[i].level)
+    for ((type, level, line) in paragraphs) {
+        if (currLevel == level)
             writer.append(listForClose.removeLast())
-        if (paragraphs[i].level > currLevel)
-            when (paragraphs[i].type) {
+        if (level > currLevel)
+            when (type) {
                 1 -> {
                     writer.append("<ol>\n")
                     listForClose.add("</ol>\n")
@@ -430,14 +430,14 @@ fun markdownToHtmlLists(inputName: String, outputName: String) {
 
                 }
             }
-        else if (paragraphs[i].level < currLevel)
-            for (j in 0 until currLevel - paragraphs[i].level + 2) writer.append(listForClose.removeLast())
-        else if (currType != paragraphs[i].type && currType != 0)
+        else if (level < currLevel)
+            for (j in 0 until currLevel - level + 2) writer.append(listForClose.removeLast())
+        else if (currType != type && currType != 0)
             writer.append(listForClose.removeLast())
-        if (paragraphs[i].type != 0) {
-            currType = paragraphs[i].type
-            currLevel = paragraphs[i].level
-            writer.append("<li>" + paragraphs[i].line)
+        if (type != 0) {
+            currType = type
+            currLevel = level
+            writer.append("<li>$line")
             listForClose.add("</li>\n")
         }
     }
@@ -524,7 +524,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     var currRank = 10.pow(numberOFAllDigits)
     var currRankNumber = numberOFAllDigits
     val builder = StringBuilder()
-    val getDashes = { n: Int -> String(CharArray(n) { '-' }) }
+    val getDashes = { n: Int -> "-".repeat(n) }
     val formatStr = { n: Int, str: String -> String(CharArray(n - str.length) { ' ' }) + str }
     var firstCheck = false
     val checkForSpace = digitNumber(lhv) == digitNumber((lhv / rhv) * rhv)
