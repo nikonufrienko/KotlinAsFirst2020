@@ -385,61 +385,57 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
 ///////////////////////////////конец файла//////////////////////////////////////////////////////////////////////////////
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
-
-fun markdownToHtmlLists(inputName: String, outputName: String) {
-    data class Paragraph(val type: Int, val level: Int, val line: String)
-
-    fun whatIsThisLine(line: String): Paragraph {
-        var checkForNumber = false
-        var rank = 0
-        for (i in line.indices)
-            when (line[i]) {
-                '*' -> return Paragraph(2, i / 4, line.substring(i + 2))
-                ' ' -> continue
-                in ('0'..'9') -> {
-                    if (!checkForNumber) {
-                        rank = i
-                        checkForNumber = true
-                    }
+enum class Type { NUMBERABLE, NONUMBERABLE, UNDEFINED }
+data class Paragraph(val type: Type, val level: Int, val line: String)
+fun whatIsThisLine(line: String): Paragraph {
+    var checkForNumber = false
+    var rank = 0
+    for (i in line.indices)
+        when (line[i]) {
+            '*' -> return Paragraph(Type.NONUMBERABLE, i / 4, line.substring(i + 2))
+            ' ' -> continue
+            in ('0'..'9') -> {
+                if (!checkForNumber) {
+                    rank = i
+                    checkForNumber = true
                 }
-                '.' -> if (checkForNumber) return Paragraph(1, rank / 4, line.substring(i + 2)) else
-                    return Paragraph(0, 0, line)
             }
-        return Paragraph(0, 0, line)
-    }
-
+            '.' -> if (checkForNumber) return Paragraph(Type.NUMBERABLE, rank / 4, line.substring(i + 2)) else
+                return Paragraph(Type.UNDEFINED, 0, line)
+        }
+    return Paragraph(Type.UNDEFINED, 0, line)
+}
+fun markdownToHtmlLists(inputName: String, outputName: String) {
     val writer = File(outputName).writer()
     writer.append("<html><body><p>")
     val strSplited = File(inputName).readLines()
     val paragraphs = strSplited.map { whatIsThisLine(it) }
     var currLevel = -1
     val listForClose = mutableListOf<String>()
-    var currType = 0
+    var currType = Type.UNDEFINED
     for ((type, level, line) in paragraphs) {
         if (currLevel == level)
             writer.append(listForClose.removeLast())
         if (level > currLevel)
             when (type) {
-                1 -> {
+                Type.NUMBERABLE -> {
                     writer.append("<ol>\n")
                     listForClose.add("</ol>\n")
                 }
-                2 -> {
+                Type.NONUMBERABLE -> {
                     writer.append("<ul>\n")
                     listForClose.add("</ul>\n")
-
                 }
+                Type.UNDEFINED -> continue
             }
         else if (level < currLevel)
             for (j in 0 until currLevel - level + 2) writer.append(listForClose.removeLast())
-        else if (currType != type && currType != 0)
+        else if (currType != type)
             writer.append(listForClose.removeLast())
-        if (type != 0) {
-            currType = type
-            currLevel = level
-            writer.append("<li>$line")
-            listForClose.add("</li>\n")
-        }
+        currType = type
+        currLevel = level
+        writer.append("<li>$line")
+        listForClose.add("</li>\n")
     }
     for (i in listForClose.indices) writer.append(listForClose.removeLast()) // закрываем все не закрытые теги
     writer.append("</p></body></html>")
@@ -524,7 +520,6 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     var currRank = 10.pow(numberOFAllDigits)
     var currRankNumber = numberOFAllDigits
     val builder = StringBuilder()
-    val getDashes = { n: Int -> "-".repeat(n) }
     val formatStr = { n: Int, str: String -> String(CharArray(n - str.length) { ' ' }) + str }
     var firstCheck = false
     val checkForSpace = digitNumber(lhv) == digitNumber((lhv / rhv) * rhv)
@@ -541,25 +536,20 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         lhvVariable -= deductible
         if (deductible != 0 || firstCheck || currRankNumber == 0) {
             val spacesNumber = numberOFAllDigits - currRankNumber + additionSpace
+            val line1 = "-${deductible / currRank}"
+            val line2 = "-".repeat(
+                maxOf(digitNumber(lhvVariable / currRank), digitNumber(deductible / currRank) + 1)
+            )
+            val line3 = if (currRank >= 10) String.format("%02d", (lhvVariable / (currRank / 10)))
+            else (lhvVariable / currRank).toString()
+            val lengthOfThirdLine = numberOFAllDigits + additionSpace - currRankNumber + if (currRank >= 10) 1 else 0
             builder.append(
-                formatStr(spacesNumber, "-${deductible / currRank}"),
-                if (!firstCheck)
-                    formatStr(currRankNumber + 3, " ") + (lhv / rhv).toString()
-                else "",
+                formatStr(spacesNumber, line1),
+                if (!firstCheck) formatStr(currRankNumber + 3, " ") + (lhv / rhv).toString() else "",
                 '\n'
             )
-            builder.append(
-                formatStr(
-                    spacesNumber, getDashes(
-                        maxOf(digitNumber(lhvVariable / currRank), digitNumber(deductible / currRank) + 1))),
-                '\n'
-            )
-            builder.append(
-                formatStr(numberOFAllDigits + additionSpace - currRankNumber + if (currRank >= 10) 1 else 0,
-                    (if (currRank >= 10) String.format("%02d", (lhvVariable / (currRank / 10)))
-                    else (lhvVariable / currRank).toString())),
-                '\n'
-            )
+            builder.append(formatStr(spacesNumber, line2), '\n')
+            builder.append(formatStr(lengthOfThirdLine, line3), '\n')
             firstCheck = true
         }
     }
