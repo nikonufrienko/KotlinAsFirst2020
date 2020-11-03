@@ -520,26 +520,23 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     var currRank = 10.pow(numberOFAllDigits)
     var currRankNumber = numberOFAllDigits
     val builder = StringBuilder()
-    val formatStr = { n: Int, str: String -> String(CharArray(n - str.length) { ' ' }) + str }
+    val formatStr = { n: Int, str: String -> " ".repeat(n - str.length) + str }
     var firstCheck = false
     val checkForSpace = digitNumber(lhv) == digitNumber((lhv / rhv) * rhv)
     val additionSpace = if (checkForSpace) 1 else 0
     builder.append(if (checkForSpace) " " else "", lhv, " | ", rhv, '\n')
-    while (true) {
-        if (currRank >= 10) {
-            currRank /= 10
-            currRankNumber--
-        } else break
+    while (currRank >= 10) {
+        currRank /= 10
+        currRankNumber--
         val deductible =
             if (lhvVariable / currRank >= rhv) (((lhvVariable / currRank) / rhv) * rhv) * currRank
             else 0
         lhvVariable -= deductible
         if (deductible != 0 || firstCheck || currRankNumber == 0) {
             val spacesNumber = numberOFAllDigits - currRankNumber + additionSpace
+            val dashNumber = maxOf(digitNumber(lhvVariable / currRank), digitNumber(deductible / currRank) + 1)
             val line1 = "-${deductible / currRank}"
-            val line2 = "-".repeat(
-                maxOf(digitNumber(lhvVariable / currRank), digitNumber(deductible / currRank) + 1)
-            )
+            val line2 = "-".repeat(dashNumber)
             val line3 = if (currRank >= 10) String.format("%02d", (lhvVariable / (currRank / 10)))
             else (lhvVariable / currRank).toString()
             val lengthOfThirdLine = numberOFAllDigits + additionSpace - currRankNumber + if (currRank >= 10) 1 else 0
