@@ -300,7 +300,7 @@ data class Field15(val matrix: Matrix<Int>) {
     }
 
     fun doAction(action: Int) {
-        val cell = availableActions()[action] ?: error("Не корректное действие \n$matrix \naction:$action")
+        val cell = availableActions()[action] ?: error("Некорректное действие \n$matrix \naction:$action")
         doActualAction(action to cell)
     }
 
@@ -393,11 +393,12 @@ fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
         startDiff to mutableListOf(ElementF15(startDiff, field.getCopy(), listOf<Int>()))
     )
     val used = mutableSetOf<Matrix<Int>>()
-    while (activeElements.isNotEmpty() && activeElements.firstKey() < 100) {
-        val element = activeElements[activeElements.firstKey()]?.removeAt(0) ?: error("Этого не могло произойти")
+    while (activeElements.isNotEmpty()) {
+        val firstKey = activeElements.firstKey()
+        val element = activeElements[firstKey]?.removeAt(0) ?: error("Этого не могло произойти")
         used.add(element.field.matrix)
-        if (activeElements[activeElements.firstKey()]?.isEmpty() ?: error("Этого не могло произойти"))
-            activeElements.remove(activeElements.firstKey())
+        if (activeElements[firstKey]?.isEmpty() ?: error("Этого не могло произойти"))
+            activeElements.remove(firstKey)
         val field15 = element.field
         val commands = element.commands
         for (action in field15.availableActions()) {
@@ -405,14 +406,14 @@ fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
             newField.doActualAction(action.toPair())
             if (newField.matrix in used)
                 continue
-            if (newField.matrix == targetField)
-                return commands + action.key
             val diff = newField.seeDifferences(targetField)
-            val newElement = ElementF15(diff, newField, commands + action.key)
+            if (diff == 0)
+                return commands + action.key
+            val newElement = ElementF15(diff - 1, newField, commands + action.key)
             if (activeElements[diff] == null)
                 activeElements[diff] = mutableListOf(newElement)
             else
-                activeElements[diff]!!.add(newElement)
+                activeElements[diff]?.add(newElement) ?: error("Этого не могло произойти")
         }
     }
     return listOf()

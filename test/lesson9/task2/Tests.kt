@@ -390,6 +390,7 @@ class Tests {
             )
         )
         val result = fifteenGameMoves(copy, moves)
+        println(moves)
         assertTrue(result == start1 || result == start2) { "Result position is not a solution position: $result" }
     }
 
@@ -418,6 +419,12 @@ class Tests {
             4, 4, listOf(
                 listOf(0, 1, 2, 3), listOf(4, 5, 6, 7),
                 listOf(8, 9, 10, 11), listOf(12, 13, 14, 15)
+            )
+        ).assertSolution()
+        createMatrix(
+            4, 4, listOf(
+                listOf(0, 2, 4, 3), listOf(1, 10, 7, 9),
+                listOf(6, 8, 15, 12), listOf(13, 11, 14, 5)
             )
         ).assertSolution()
     }
