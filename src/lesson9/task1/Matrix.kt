@@ -115,7 +115,10 @@ data class MatrixImpl<E>(
         return this
     }
 
-    override fun getCopy(): Matrix<E> = MatrixImpl(height, width, this.matrixList.toMutableList())
+    override fun getCopy(): Matrix<E> {
+        val newList = matrixList.toMutableList()
+        return MatrixImpl(height, width, newList)
+    }
 }
 
 
