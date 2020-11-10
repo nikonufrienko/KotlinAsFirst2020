@@ -2,6 +2,7 @@
 
 package lesson9.task2
 
+import lesson9.task1.Cell
 import lesson9.task1.Matrix
 import lesson9.task1.createMatrix
 
@@ -245,7 +246,63 @@ fun canOpenLock(key: Matrix<Int>, lock: Matrix<Int>): Triple<Boolean, Int, Int> 
  * 0  4 13  6
  * 3 10 11  8
  */
-fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> = TODO()
+
+data class Field15(val matrix: Matrix<Int>) {
+    private var currentZeroPos = Cell(-1, -1)
+    fun findZeroPos() {
+        currentZeroPos = matrix.search(0)
+    }
+
+    fun seeDifferences(other: Matrix<Int>): Int {
+        var counter = 0
+        for (y in 0 until matrix.height)
+            for (x in 0 until matrix.width)
+                if (other[y, x] != matrix[y, x] && matrix[y, x] != 0)
+                    counter++
+        return counter
+    }
+
+    fun availableActions(): Map<Int, Cell> {
+        val mapOfActions = mutableMapOf<Int, Cell>()
+        if (currentZeroPos == Cell(-1, -1)) findZeroPos()
+        val y = currentZeroPos.row
+        val x = currentZeroPos.column
+        if (x < matrix.width - 1)
+            mapOfActions[matrix[y, x + 1]] = Cell(y, x + 1)
+        if (x > 0)
+            mapOfActions[matrix[y, x - 1]] = Cell(y, x - 1)
+        if (y < matrix.height - 1)
+            mapOfActions[matrix[y + 1, x]] = Cell(y + 1, x)
+        if (y > 0)
+            mapOfActions[matrix[y - 1, x]] = Cell(y - 1, x)
+        return mapOfActions
+    }
+
+    fun doActualAction(action: Pair<Int, Cell>) {
+        if (matrix[action.second] != action.first) throw error("Действие не актуально")
+        matrix[currentZeroPos] = matrix[action.second]
+        matrix[action.second] = 0
+        currentZeroPos = action.second
+    }
+
+    fun doAction(action: Int) {
+        val cell = availableActions()[action] ?: error("Не корректное действие \n$matrix \naction:$action")
+        doActualAction(action to cell)
+    }
+
+    fun copy(): Field15 {
+        val newField = Field15(matrix.copy())
+        newField.currentZeroPos = this.currentZeroPos
+        return newField
+    }
+}
+
+fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> {
+    val field = Field15(matrix)
+    for (action in moves)
+        field.doAction(action)
+    return field.matrix
+}
 
 /**
  * Очень сложная (32 балла)
@@ -286,4 +343,62 @@ fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> = TODO(
  *
  * Перед решением этой задачи НЕОБХОДИМО решить предыдущую
  */
-fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> = TODO()
+
+
+data class ElementF15(val minNumOfNextSteps: Int, val field: Field15, val commands: List<Int>)
+
+fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
+    val field = Field15(matrix)
+    var checksum = 0
+    for (i in 0 until 16) {
+        if (field.matrix[i / 4, i % 4]  == 0)
+            continue
+        checksum += (i / 4) + 1
+        for (j in i until 16)
+            if (field.matrix[j / 4, j % 4] < field.matrix[i / 4, i % 4] && field.matrix[j / 4, j % 4] != 0) checksum++
+    }
+    val targetField =
+        if (checksum % 2 == 0) createMatrix(4, 4, 0).writeList(
+            listOf(
+                1, 2, 3, 4, 5, 6, 7, 8,
+                9, 10, 11, 12, 13, 14, 15, 0
+            )
+        )
+        else createMatrix(4, 4, 0).writeList(
+            listOf(
+                1, 2, 3, 4, 5, 6, 7, 8,
+                9, 10, 11, 12, 13, 15, 14, 0
+            )
+        )
+    if (field.matrix == targetField)
+        return listOf()
+    field.findZeroPos()
+    val startDiff = field.seeDifferences(targetField)
+    val activeElements = sortedMapOf<Int, MutableList<ElementF15>>(
+        startDiff to mutableListOf(ElementF15(startDiff, field.copy(), listOf<Int>()))
+    )
+    val used = mutableSetOf<Matrix<Int>>()
+    while (activeElements.isNotEmpty() && activeElements.firstKey() < 100) {
+        val element = activeElements[activeElements.firstKey()]!!.removeAt(0)
+        used.add(element.field.matrix)
+        if (activeElements[activeElements.firstKey()]!!.isEmpty())
+            activeElements.remove(activeElements.firstKey())
+        val field15 = element.field
+        val commands = element.commands
+        for (action in field15.availableActions()) {
+            val newField = field15.copy()
+            newField.doActualAction(action.toPair())
+            if (newField.matrix in used)
+                continue
+            if (newField.matrix == targetField)
+                return commands + action.key
+            val diff = newField.seeDifferences(targetField)
+            val newElement = ElementF15(diff, newField, commands + action.key)
+            if (activeElements[diff] == null)
+                activeElements[diff] = mutableListOf(newElement)
+            else
+                activeElements[diff]!!.add(newElement)
+        }
+    }
+    return listOf()
+}

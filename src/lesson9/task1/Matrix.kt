@@ -2,13 +2,20 @@
 
 package lesson9.task1
 
+import java.lang.reflect.Array
+import java.util.Collections.addAll
+
+
 // Урок 9: проектирование классов
 // Максимальное количество баллов = 40 (без очень трудных задач = 15)
 
 /**
  * Ячейка матрицы: row = ряд, column = колонка
  */
-data class Cell(val row: Int, val column: Int)
+data class Cell(val row: Int, val column: Int) {
+    override fun equals(other: Any?) = other is Cell && other.row == row && other.column == column
+    override fun hashCode() = row * 31 + column
+}
 
 /**
  * Интерфейс, описывающий возможности матрицы. E = тип элемента матрицы
@@ -35,6 +42,9 @@ interface Matrix<E> {
     operator fun set(row: Int, column: Int, value: E)
 
     operator fun set(cell: Cell, value: E)
+    fun search(value: E): Cell
+    fun writeList(list: List<E>): Matrix<E>
+    fun copy(): Matrix<E>
 }
 
 /**
@@ -44,32 +54,70 @@ interface Matrix<E> {
  * height = высота, width = ширина, e = чем заполнить элементы.
  * Бросить исключение IllegalArgumentException, если height или width <= 0.
  */
-fun <E> createMatrix(height: Int, width: Int, e: E): Matrix<E> = TODO()
+
+fun <E> createMatrix(height: Int, width: Int, e: E): Matrix<E> {
+    if (width <= 0 || height <= 0) throw IllegalArgumentException()
+    return MatrixImpl<E>(height, width, MutableList(height * width) { e })
+}
 
 /**
  * Средняя сложность (считается двумя задачами в 3 балла каждая)
  *
  * Реализация интерфейса "матрица"
  */
-class MatrixImpl<E> : Matrix<E> {
-    override val height: Int = TODO()
-
-    override val width: Int = TODO()
-
-    override fun get(row: Int, column: Int): E = TODO()
-
-    override fun get(cell: Cell): E = TODO()
+data class MatrixImpl<E>(
+    override val height: Int, override val width: Int, val matrixList: MutableList<E>
+) : Matrix<E> {
+    override fun get(row: Int, column: Int): E = matrixList[row * width + column]
+    override fun get(cell: Cell): E = get(cell.row, cell.column)
 
     override fun set(row: Int, column: Int, value: E) {
-        TODO()
+        matrixList[row * width + column] = value
     }
 
     override fun set(cell: Cell, value: E) {
-        TODO()
+        set(cell.row, cell.column, value)
     }
 
-    override fun equals(other: Any?) = TODO()
+    override fun equals(other: Any?) = other is MatrixImpl<*> && other.height == height && other.width == width
+            && other.matrixList == matrixList
 
-    override fun toString(): String = TODO()
+    override fun hashCode(): Int {
+        var result = 5
+        result = result * 31 + height
+        result = result * 31 + width
+        for (i in matrixList) {
+            result *= 31
+            result += i.toString().length
+        }
+        return result
+    }
+
+    override fun toString(): String {
+        val sb = StringBuilder()
+        sb.append("[")
+        for (row in 0 until height) {
+            sb.append("[")
+            for (column in 0 until width) {
+                sb.append(this[row, column], ' ')
+            }
+            sb.append("] \n")
+        }
+        sb.append("]")
+        return sb.toString()
+    }
+
+    override fun search(value: E): Cell {
+        val index = matrixList.indexOf(value)
+        return Cell(index / width, index % width)
+    }
+
+    override fun writeList(list: List<E>): Matrix<E> {
+        for (i in matrixList.indices) matrixList[i] = list[i]
+        return this
+    }
+
+    override fun copy(): Matrix<E> = MatrixImpl(height, width, this.matrixList.toMutableList())
 }
+
 
