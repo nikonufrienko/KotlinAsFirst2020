@@ -6,6 +6,8 @@ import lesson9.task1.Cell
 import lesson9.task1.Matrix
 import lesson9.task1.MatrixImpl
 import lesson9.task1.createMatrix
+import kotlin.random.Random
+import kotlin.system.measureTimeMillis
 
 // Все задачи в этом файле требуют наличия реализации интерфейса "Матрица" в Matrix.kt
 
@@ -395,7 +397,8 @@ fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
     val used = mutableSetOf<Matrix<Int>>()
     while (activeElements.isNotEmpty()) {
         val firstKey = activeElements.firstKey()
-        val element = activeElements[firstKey]?.removeAt(0) ?: error("Этого не могло произойти")
+        val element = activeElements[firstKey]?.removeLast() ?: error("Этого не могло произойти")
+        //замена removeLast() на removeFirst() приводит к более короткому ответу, но также и к более длительному решению
         used.add(element.field.matrix)
         if (activeElements[firstKey]?.isEmpty() ?: error("Этого не могло произойти"))
             activeElements.remove(firstKey)
@@ -417,4 +420,23 @@ fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
         }
     }
     return listOf()
+}
+fun main() {
+    var maxTime = -0.01
+    while (true) {
+        val matrix = createMatrix(4, 4, 0)
+        val values = (0..15).toMutableSet()
+        for (y in 0 until matrix.height)
+            for (x in 0 until matrix.width){
+                matrix[y, x] = values.random()
+                values -= matrix[y, x]
+            }
+        println("Сгенерирована матрица: \n $matrix")
+        var answer: List<Int>
+        val time = measureTimeMillis { answer = fifteenGameSolution(matrix) }.toDouble() / 1000
+        if (time > maxTime)
+            maxTime = time
+        println("Время решения: $time, максимальное время: $maxTime")
+        println(answer.size)
+    }
 }
