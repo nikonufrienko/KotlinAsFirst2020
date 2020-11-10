@@ -522,7 +522,9 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     val builder = StringBuilder()
     val formatStr = { n: Int, str: String -> " ".repeat(n - str.length) + str }
     var firstCheck = false
-    val checkForSpace = digitNumber(lhv) == digitNumber((lhv / rhv) * rhv)
+    var n = currRank
+    while ((lhv / n) / rhv == 0 && n > 1) n /= 10
+    val checkForSpace = numberOFAllDigits == digitNumber(((lhv / n) / rhv) * rhv * n)
     val additionSpace = if (checkForSpace) 1 else 0
     builder.append(if (checkForSpace) " " else "", lhv, " | ", rhv, '\n')
     while (currRank >= 10) {
