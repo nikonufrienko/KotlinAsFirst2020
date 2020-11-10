@@ -2,8 +2,6 @@
 
 package lesson9.task1
 
-import java.lang.reflect.Array
-import java.util.Collections.addAll
 
 
 // Урок 9: проектирование классов
