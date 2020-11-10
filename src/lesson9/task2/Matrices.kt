@@ -392,9 +392,11 @@ fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
     val activeElements = sortedMapOf<Int, MutableList<ElementF15>>(
         startDiff to mutableListOf(ElementF15(field.getCopy(), listOf<Int>()))
     )
+    val used = mutableSetOf<Matrix<Int>>()
     while (activeElements.isNotEmpty()) {
         val firstKey = activeElements.firstKey()
         val element = activeElements[firstKey]?.removeAt(0) ?: error("Этого не могло произойти")
+        used.add(element.field.matrix)
         if (activeElements[firstKey]?.isEmpty() ?: error("Этого не могло произойти"))
             activeElements.remove(firstKey)
         val field15 = element.field
@@ -402,6 +404,8 @@ fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
         for (action in field15.availableActions()) {
             val newField = field15.getCopy()
             newField.doActualAction(action.toPair())
+            if (newField.matrix in used)
+                continue
             val diff = newField.seeDifferences(targetField)
             if (diff == 0)
                 return commands + action.key
