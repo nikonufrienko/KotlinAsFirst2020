@@ -290,8 +290,8 @@ data class Field15(val matrix: Matrix<Int>) {
         doActualAction(action to cell)
     }
 
-    fun copy(): Field15 {
-        val newField = Field15(matrix.copy())
+    fun getCopy(): Field15 {
+        val newField = Field15(matrix.getCopy())
         newField.currentZeroPos = this.currentZeroPos
         return newField
     }
@@ -375,7 +375,7 @@ fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
     field.findZeroPos()
     val startDiff = field.seeDifferences(targetField)
     val activeElements = sortedMapOf<Int, MutableList<ElementF15>>(
-        startDiff to mutableListOf(ElementF15(startDiff, field.copy(), listOf<Int>()))
+        startDiff to mutableListOf(ElementF15(startDiff, field.getCopy(), listOf<Int>()))
     )
     val used = mutableSetOf<Matrix<Int>>()
     while (activeElements.isNotEmpty() && activeElements.firstKey() < 100) {
@@ -386,7 +386,7 @@ fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
         val field15 = element.field
         val commands = element.commands
         for (action in field15.availableActions()) {
-            val newField = field15.copy()
+            val newField = field15.getCopy()
             newField.doActualAction(action.toPair())
             if (newField.matrix in used)
                 continue

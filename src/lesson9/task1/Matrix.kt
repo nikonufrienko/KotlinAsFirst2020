@@ -42,7 +42,7 @@ interface Matrix<E> {
     operator fun set(cell: Cell, value: E)
     fun search(value: E): Cell
     fun writeList(list: List<E>): Matrix<E>
-    fun copy(): Matrix<E>
+    fun getCopy(): Matrix<E>
 }
 
 /**
@@ -115,7 +115,7 @@ data class MatrixImpl<E>(
         return this
     }
 
-    override fun copy(): Matrix<E> = MatrixImpl(height, width, this.matrixList.toMutableList())
+    override fun getCopy(): Matrix<E> = MatrixImpl(height, width, this.matrixList.toMutableList())
 }
 
 
