@@ -4,6 +4,7 @@ package lesson9.task2
 
 import lesson9.task1.Cell
 import lesson9.task1.Matrix
+import lesson9.task1.MatrixImpl
 import lesson9.task1.createMatrix
 
 // Все задачи в этом файле требуют наличия реализации интерфейса "Матрица" в Matrix.kt
@@ -246,7 +247,14 @@ fun canOpenLock(key: Matrix<Int>, lock: Matrix<Int>): Triple<Boolean, Int, Int> 
  * 0  4 13  6
  * 3 10 11  8
  */
+fun Matrix<Int>.getCopy(): Matrix<Int> {
+    val list = mutableListOf<Int>()
+    for (y in 0 until height)
+        for (x in 0 until width)
+            list.add(this[y, x])
+    return MatrixImpl(height, width, list)
 
+}
 data class Field15(val matrix: Matrix<Int>) {
     private var currentZeroPos = Cell(-1, -1)
     fun findZeroPos() {
@@ -343,7 +351,6 @@ fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> {
  *
  * Перед решением этой задачи НЕОБХОДИМО решить предыдущую
  */
-
 
 data class ElementF15(val minNumOfNextSteps: Int, val field: Field15, val commands: List<Int>)
 

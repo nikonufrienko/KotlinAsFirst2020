@@ -42,14 +42,6 @@ interface Matrix<E> {
     operator fun set(cell: Cell, value: E)
     fun search(value: E): Cell
     fun writeList(list: List<E>): Matrix<E>
-    fun getCopy(): Matrix<E> {
-        val list = mutableListOf<E>()
-        for (y in 0 until height)
-            for (x in 0 until width)
-                list.add(this[y, x])
-        return MatrixImpl(height, width, list)
-
-    }
 }
 
 /**
@@ -121,8 +113,6 @@ class MatrixImpl<E>(
         for (i in matrixList.indices) matrixList[i] = list[i]
         return this
     }
-
-    override fun getCopy(): Matrix<E> = MatrixImpl(height, width, this.matrixList.toMutableList())
 }
 
 
