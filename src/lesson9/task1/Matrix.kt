@@ -40,8 +40,6 @@ interface Matrix<E> {
     operator fun set(row: Int, column: Int, value: E)
 
     operator fun set(cell: Cell, value: E)
-    fun search(value: E): Cell
-    fun writeList(list: List<E>): Matrix<E>
 }
 
 /**
@@ -102,16 +100,6 @@ class MatrixImpl<E>(
         }
         sb.append("]")
         return sb.toString()
-    }
-
-    override fun search(value: E): Cell {
-        val index = matrixList.indexOf(value)
-        return Cell(index / width, index % width)
-    }
-
-    override fun writeList(list: List<E>): Matrix<E> {
-        for (i in matrixList.indices) matrixList[i] = list[i]
-        return this
     }
 }
 

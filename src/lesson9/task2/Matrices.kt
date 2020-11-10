@@ -255,6 +255,12 @@ fun Matrix<Int>.getCopy(): Matrix<Int> {
     return MatrixImpl(height, width, list)
 
 }
+fun Matrix<Int>.search(value: Int): Cell {
+    for (y in 0 until height)
+        for (x in 0 until width)
+            if (this[y, x] == value) return Cell(y, x)
+    return Cell(-1, -1)
+}
 data class Field15(val matrix: Matrix<Int>) {
     private var currentZeroPos = Cell(-1, -1)
     fun findZeroPos() {
@@ -358,21 +364,23 @@ fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
     val field = Field15(matrix)
     var checksum = 0
     for (i in 0 until 16) {
-        if (field.matrix[i / 4, i % 4]  == 0)
+        if (field.matrix[i / 4, i % 4] == 0)
             continue
         checksum += (i / 4) + 1
         for (j in i until 16)
             if (field.matrix[j / 4, j % 4] < field.matrix[i / 4, i % 4] && field.matrix[j / 4, j % 4] != 0) checksum++
     }
     val targetField =
-        if (checksum % 2 == 0) createMatrix(4, 4, 0).writeList(
-            listOf(
+        if (checksum % 2 == 0) MatrixImpl<Int>(
+            4, 4,
+            mutableListOf(
                 1, 2, 3, 4, 5, 6, 7, 8,
                 9, 10, 11, 12, 13, 14, 15, 0
             )
         )
-        else createMatrix(4, 4, 0).writeList(
-            listOf(
+        else MatrixImpl<Int>(
+            4, 4,
+            mutableListOf(
                 1, 2, 3, 4, 5, 6, 7, 8,
                 9, 10, 11, 12, 13, 15, 14, 0
             )
@@ -386,9 +394,9 @@ fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
     )
     val used = mutableSetOf<Matrix<Int>>()
     while (activeElements.isNotEmpty() && activeElements.firstKey() < 100) {
-        val element = activeElements[activeElements.firstKey()]!!.removeAt(0)
+        val element = activeElements[activeElements.firstKey()]?.removeAt(0) ?: error("Этого не могло произойти")
         used.add(element.field.matrix)
-        if (activeElements[activeElements.firstKey()]!!.isEmpty())
+        if (activeElements[activeElements.firstKey()]?.isEmpty() ?: error("Этого не могло произойти"))
             activeElements.remove(activeElements.firstKey())
         val field15 = element.field
         val commands = element.commands
