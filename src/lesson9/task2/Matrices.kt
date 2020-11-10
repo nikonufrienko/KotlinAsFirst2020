@@ -358,7 +358,7 @@ fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> {
  * Перед решением этой задачи НЕОБХОДИМО решить предыдущую
  */
 
-data class ElementF15(val minNumOfNextSteps: Int, val field: Field15, val commands: List<Int>)
+data class ElementF15(val field: Field15, val commands: List<Int>)
 
 fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
     val field = Field15(matrix)
@@ -390,7 +390,7 @@ fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
     field.findZeroPos()
     val startDiff = field.seeDifferences(targetField)
     val activeElements = sortedMapOf<Int, MutableList<ElementF15>>(
-        startDiff to mutableListOf(ElementF15(startDiff, field.getCopy(), listOf<Int>()))
+        startDiff to mutableListOf(ElementF15(field.getCopy(), listOf<Int>()))
     )
     val used = mutableSetOf<Matrix<Int>>()
     while (activeElements.isNotEmpty()) {
@@ -409,7 +409,7 @@ fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
             val diff = newField.seeDifferences(targetField)
             if (diff == 0)
                 return commands + action.key
-            val newElement = ElementF15(diff - 1, newField, commands + action.key)
+            val newElement = ElementF15(newField, commands + action.key)
             if (activeElements[diff] == null)
                 activeElements[diff] = mutableListOf(newElement)
             else
