@@ -63,7 +63,7 @@ fun <E> createMatrix(height: Int, width: Int, e: E): Matrix<E> {
  *
  * Реализация интерфейса "матрица"
  */
-data class MatrixImpl<E>(
+class MatrixImpl<E>(
     override val height: Int, override val width: Int, val matrixList: MutableList<E>
 ) : Matrix<E> {
     override fun get(row: Int, column: Int): E = matrixList[row * width + column]
