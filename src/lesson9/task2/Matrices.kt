@@ -6,6 +6,7 @@ import lesson9.task1.Cell
 import lesson9.task1.Matrix
 import lesson9.task1.MatrixImpl
 import lesson9.task1.createMatrix
+import javax.swing.Spring
 import kotlin.random.Random
 import kotlin.system.measureTimeMillis
 
@@ -257,12 +258,14 @@ fun Matrix<Int>.getCopy(): Matrix<Int> {
     return MatrixImpl(height, width, list)
 
 }
+
 fun Matrix<Int>.search(value: Int): Cell {
     for (y in 0 until height)
         for (x in 0 until width)
             if (this[y, x] == value) return Cell(y, x)
     return Cell(-1, -1)
 }
+
 data class Field15(val matrix: Matrix<Int>) {
     private var currentZeroPos = Cell(-1, -1)
     fun findZeroPos() {
@@ -275,6 +278,35 @@ data class Field15(val matrix: Matrix<Int>) {
             for (x in 0 until matrix.width)
                 if (other[y, x] != matrix[y, x] && matrix[y, x] != 0)
                     counter++
+        return counter
+    }
+
+    private fun getNearestCells(cell: Cell): Set<Int> {
+        val result = mutableSetOf<Int>()
+        val y = cell.row
+        val x = cell.column
+        if (x < matrix.width - 1)
+            result += matrix[Cell(y, x + 1)]
+        if (x > 0)
+            result += matrix[Cell(y, x - 1)]
+        if (y < matrix.height - 1)
+            result += matrix[Cell(y + 1, x)]
+        if (y > 0)
+            result += matrix[Cell(y - 1, x)]
+        return result
+    }
+
+    fun getSimilarity(other: Field15): Int {
+        val map = mutableMapOf<Int, Set<Int>>()
+        var counter = 0
+        for (y in 0 until matrix.height)
+            for (x in 0 until matrix.width)
+                map[matrix[x, y]] = getNearestCells(Cell(y, x))
+        for (y in 0 until other.matrix.height)
+            for (x in 0 until other.matrix.width) {
+                val nearestCells = other.getNearestCells(Cell(y, x))
+                counter += (nearestCells - map[other.matrix[y, x]]).size
+            }
         return counter
     }
 
@@ -387,13 +419,11 @@ fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
                 9, 10, 11, 12, 13, 15, 14, 0
             )
         )
-    if (field.matrix == targetField)
-        return listOf()
-    field.findZeroPos()
     val startDiff = field.seeDifferences(targetField)
     val activeElements = sortedMapOf<Int, MutableList<ElementF15>>(
         startDiff to mutableListOf(ElementF15(field.getCopy(), listOf<Int>()))
     )
+    val targetF15 = Field15(targetField)
     val used = mutableSetOf<Matrix<Int>>()
     while (activeElements.isNotEmpty()) {
         val firstKey = activeElements.firstKey()
@@ -409,7 +439,7 @@ fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
             newField.doActualAction(action.toPair())
             if (newField.matrix in used)
                 continue
-            val diff = newField.seeDifferences(targetField)
+            val diff = newField.seeDifferences(targetField) * newField.getSimilarity(targetF15)
             if (diff == 0)
                 return commands + action.key
             val newElement = ElementF15(newField, commands + action.key)
@@ -421,17 +451,18 @@ fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
     }
     return listOf()
 }
+
 fun main() {
     var maxTime = -0.01
     while (true) {
         val matrix = createMatrix(4, 4, 0)
         val values = (0..15).toMutableSet()
         for (y in 0 until matrix.height)
-            for (x in 0 until matrix.width){
+            for (x in 0 until matrix.width) {
                 matrix[y, x] = values.random()
                 values -= matrix[y, x]
             }
-        println("Сгенерирована матрица: \n $matrix")
+        println("Сгенерирована матрица: \n$matrix")
         var answer: List<Int>
         val time = measureTimeMillis { answer = fifteenGameSolution(matrix) }.toDouble() / 1000
         if (time > maxTime)
