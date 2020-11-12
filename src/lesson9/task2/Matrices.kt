@@ -251,14 +251,6 @@ fun canOpenLock(key: Matrix<Int>, lock: Matrix<Int>): Triple<Boolean, Int, Int> 
  * 0  4 13  6
  * 3 10 11  8
  */
-fun Matrix<Int>.getCopy(): Matrix<Int> {
-    val list = mutableListOf<Int>()
-    for (y in 0 until height)
-        for (x in 0 until width)
-            list.add(this[y, x])
-    return MatrixImpl(height, width, list)
-
-}
 
 fun Matrix<Int>.search(value: Int): Cell {
     for (y in 0 until height)
@@ -269,56 +261,48 @@ fun Matrix<Int>.search(value: Int): Cell {
 
 data class Field15(val matrix: Matrix<Int>) {
     private var currentZeroPos = Cell(-1, -1)
-    fun findZeroPos() {
+    private fun findZeroPos() {
         currentZeroPos = matrix.search(0)
     }
 
-    val listOfActions = mutableListOf<Int>()
-    val setOfClosed = mutableSetOf<Int>()
-    var currentStart = Cell(0, 0)
-    fun seeDifferences(other: Matrix<Int>): Int {
-        var counter = 0
-        for (y in 0 until matrix.height)
-            for (x in 0 until matrix.width)
-                if (other[y, x] != matrix[y, x] && matrix[y, x] != 0)
-                    counter++
-        return counter
-    }
+    private val listOfActions = mutableListOf<Int>()
+    private val setOfClosed = mutableSetOf<Int>()
+    private var currentStart = Cell(0, 0)
 
-    fun toRight() {
+    private fun toRight() {
         val action = matrix[currentZeroPos.row, currentZeroPos.column + 1]
         doAction(action)
         listOfActions.add(action)
     }
 
-    fun toLeft() {
+    private fun toLeft() {
         val action = matrix[currentZeroPos.row, currentZeroPos.column - 1]
         doAction(action)
         listOfActions.add(action)
     }
 
-    fun toUp() {
+    private fun toUp() {
         val action = matrix[currentZeroPos.row - 1, currentZeroPos.column]
         doAction(action)
         listOfActions.add(action)
     }
 
-    fun toDown() {
+    private fun toDown() {
         val action = matrix[currentZeroPos.row + 1, currentZeroPos.column]
         doAction(action)
         listOfActions.add(action)
     }
 
-    fun downIsEmpty() = currentZeroPos.row < matrix.height - 1
+    private fun downIsEmpty() = currentZeroPos.row < matrix.height - 1
             && matrix[currentZeroPos.row + 1, currentZeroPos.column] !in setOfClosed
 
-    fun upIsEmpty() = currentZeroPos.row > 0
+    private fun upIsEmpty() = currentZeroPos.row > 0
             && matrix[currentZeroPos.row - 1, currentZeroPos.column] !in setOfClosed
 
-    fun rightIsEmpty() = currentZeroPos.column < matrix.width - 1
+    private fun rightIsEmpty() = currentZeroPos.column < matrix.width - 1
             && matrix[currentZeroPos.row, currentZeroPos.column + 1] !in setOfClosed
 
-    fun leftIsEmpty() = currentZeroPos.column > 0
+    private fun leftIsEmpty() = currentZeroPos.column > 0
             && matrix[currentZeroPos.row, currentZeroPos.column - 1] !in setOfClosed
 
     private fun getNearestCells(cell: Cell): Set<Int> {
@@ -336,19 +320,17 @@ data class Field15(val matrix: Matrix<Int>) {
         return result
     }
 
-    fun scroll() { //вращаем кольцо по периметру
+    private fun scroll() { //вращаем кольцо по периметру
         val lastPos = Cell(currentZeroPos.row, currentZeroPos.column - 1)
-        //println(lastPos)
         if (currentZeroPos != currentStart) error("не на стартовой позиции")
         while (currentZeroPos.column < matrix.width - 1) toRight()
         while (currentZeroPos.row < matrix.height - 1) toDown()
         while (currentZeroPos.column > 0) toLeft()
         while (currentZeroPos.row > 0 && lastPos != currentZeroPos) toUp()
         while (currentZeroPos.column < matrix.width - 1 && lastPos != currentZeroPos) toRight()
-        //println(currentZeroPos)
     }
 
-    fun reScroll() { //вращаем кольцо по периметру в обратную сторону
+    private fun reScroll() { //вращаем кольцо по периметру в обратную сторону
         val (zY, zX) = currentZeroPos
         val nextPos = when {
             zX == matrix.width - 1 && zY < matrix.height - 1 -> Cell(zY + 1, zX)
@@ -370,20 +352,20 @@ data class Field15(val matrix: Matrix<Int>) {
         }
     }
 
-    fun toStartPos() {
+    private fun toStartPos() {
         while (rightIsEmpty()) toRight() //вправо пока справа свободно
         while (upIsEmpty()) toUp() //вврерх пока сверху свободно
         while (leftIsEmpty()) toLeft() //влево
         if (currentStart != currentZeroPos) error("Ошибка в toStart")
     }
 
-    fun targetIsBlocked(targetCell: Cell): Boolean {
+    private fun targetIsBlocked(targetCell: Cell): Boolean {
         val actions = getNearestCells(targetCell)
         if ((actions - setOfClosed).size < 2) return true
         return false
     }
 
-    fun toNumber(targetCell: Cell): Boolean {
+    private fun toNumber(targetCell: Cell): Boolean {
         val (y, x) = targetCell
         if (currentZeroPos.row == y) {
             toDown()
@@ -439,24 +421,21 @@ data class Field15(val matrix: Matrix<Int>) {
         }
 
         if (matrix.height == 4) {
-            println(matrix)
             val listForMatrix = mutableListOf<Int>()
             for (y in 1 until 4)
                 for (x in 0 until 3)
                     listForMatrix.add(matrix[y, x])
             val newField = Field15(MatrixImpl<Int>(3, 3, listForMatrix))
             newField.laySolution(type)
-            //Офигеть это работает!!!
             newField.toDown()
             newField.toRight()
             newField.toRight()
-            println(newField.matrix)
             return listOfActions + newField.listOfActions + matrix[3, 3]
         }
         return listOfActions
     }
 
-    fun availableActions(): Map<Int, Cell> {
+    private fun availableActions(): Map<Int, Cell> {
         val mapOfActions = mutableMapOf<Int, Cell>()
         if (currentZeroPos == Cell(-1, -1)) findZeroPos()
         val y = currentZeroPos.row
@@ -472,7 +451,7 @@ data class Field15(val matrix: Matrix<Int>) {
         return mapOfActions
     }
 
-    fun doActualAction(action: Pair<Int, Cell>) {
+    private fun doActualAction(action: Pair<Int, Cell>) {
         if (matrix[action.second] != action.first) throw error("Действие не актуально")
         matrix[currentZeroPos] = matrix[action.second]
         matrix[action.second] = 0
@@ -482,12 +461,6 @@ data class Field15(val matrix: Matrix<Int>) {
     fun doAction(action: Int) {
         val cell = availableActions()[action] ?: error("Некорректное действие \n$matrix \naction:$action")
         doActualAction(action to cell)
-    }
-
-    fun getCopy(): Field15 {
-        val newField = Field15(matrix.getCopy())
-        newField.currentZeroPos = this.currentZeroPos
-        return newField
     }
 }
 
