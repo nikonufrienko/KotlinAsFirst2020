@@ -6,6 +6,7 @@ import lesson9.task1.Cell
 import lesson9.task1.Matrix
 import lesson9.task1.MatrixImpl
 import lesson9.task1.createMatrix
+import java.util.*
 import javax.swing.Spring
 import kotlin.random.Random
 import kotlin.system.measureTimeMillis
@@ -272,6 +273,9 @@ data class Field15(val matrix: Matrix<Int>) {
         currentZeroPos = matrix.search(0)
     }
 
+    val listOfActions = mutableListOf<Int>()
+    val setOfClosed = mutableSetOf<Int>()
+    var currentStart = Cell(0, 0)
     fun seeDifferences(other: Matrix<Int>): Int {
         var counter = 0
         for (y in 0 until matrix.height)
@@ -280,6 +284,42 @@ data class Field15(val matrix: Matrix<Int>) {
                     counter++
         return counter
     }
+
+    fun toRight() {
+        val action = matrix[currentZeroPos.row, currentZeroPos.column + 1]
+        doAction(action)
+        listOfActions.add(action)
+    }
+
+    fun toLeft() {
+        val action = matrix[currentZeroPos.row, currentZeroPos.column - 1]
+        doAction(action)
+        listOfActions.add(action)
+    }
+
+    fun toUp() {
+        val action = matrix[currentZeroPos.row - 1, currentZeroPos.column]
+        doAction(action)
+        listOfActions.add(action)
+    }
+
+    fun toDown() {
+        val action = matrix[currentZeroPos.row + 1, currentZeroPos.column]
+        doAction(action)
+        listOfActions.add(action)
+    }
+
+    fun downIsEmpty() = currentZeroPos.row < matrix.height - 1
+            && matrix[currentZeroPos.row + 1, currentZeroPos.column] !in setOfClosed
+
+    fun upIsEmpty() = currentZeroPos.row > 0
+            && matrix[currentZeroPos.row - 1, currentZeroPos.column] !in setOfClosed
+
+    fun rightIsEmpty() = currentZeroPos.column < matrix.width - 1
+            && matrix[currentZeroPos.row, currentZeroPos.column + 1] !in setOfClosed
+
+    fun leftIsEmpty() = currentZeroPos.column > 0
+            && matrix[currentZeroPos.row, currentZeroPos.column - 1] !in setOfClosed
 
     private fun getNearestCells(cell: Cell): Set<Int> {
         val result = mutableSetOf<Int>()
@@ -296,18 +336,124 @@ data class Field15(val matrix: Matrix<Int>) {
         return result
     }
 
-    fun getSimilarity(other: Field15): Int {
-        val map = mutableMapOf<Int, Set<Int>>()
-        var counter = 0
-        for (y in 0 until matrix.height)
-            for (x in 0 until matrix.width)
-                map[matrix[x, y]] = getNearestCells(Cell(y, x))
-        for (y in 0 until other.matrix.height)
-            for (x in 0 until other.matrix.width) {
-                val nearestCells = other.getNearestCells(Cell(y, x))
-                counter += (nearestCells - map[other.matrix[y, x]]).size
+    fun scroll() { //вращаем кольцо по периметру
+        val lastPos = Cell(currentZeroPos.row, currentZeroPos.column - 1)
+        //println(lastPos)
+        if (currentZeroPos != currentStart) error("не на стартовой позиции")
+        while (currentZeroPos.column < matrix.width - 1) toRight()
+        while (currentZeroPos.row < matrix.height - 1) toDown()
+        while (currentZeroPos.column > 0) toLeft()
+        while (currentZeroPos.row > 0 && lastPos != currentZeroPos) toUp()
+        while (currentZeroPos.column < matrix.width - 1 && lastPos != currentZeroPos) toRight()
+        //println(currentZeroPos)
+    }
+
+    fun reScroll() { //вращаем кольцо по периметру в обратную сторону
+        val (zY, zX) = currentZeroPos
+        val nextPos = when {
+            zX == matrix.width - 1 && zY < matrix.height - 1 -> Cell(zY + 1, zX)
+            zY == matrix.height - 1 && zX > 0 -> Cell(zY, zX - 1)
+            zX == 0 && zY > 0 -> Cell(zY - 1, zX)
+            zY == 0 && zX < matrix.width - 1 -> Cell(zY, zX + 1)
+            else -> error("Беды с рескролингом \n$matrix")
+        }
+
+        while (currentZeroPos != nextPos) {
+            val (y, x) = currentZeroPos
+            when {
+                x < matrix.width - 1 && y == matrix.height - 1 -> toRight()
+                x > 0 && y == 0 -> toLeft()
+                x == matrix.width - 1 && y > 0 -> toUp()
+                x == 0 && y < matrix.width - 1 -> toDown()
             }
-        return counter
+
+        }
+    }
+
+    fun toStartPos() {
+        while (rightIsEmpty()) toRight() //вправо пока справа свободно
+        while (upIsEmpty()) toUp() //вврерх пока сверху свободно
+        while (leftIsEmpty()) toLeft() //влево
+        if (currentStart != currentZeroPos) error("Ошибка в toStart")
+    }
+
+    fun targetIsBlocked(targetCell: Cell): Boolean {
+        val actions = getNearestCells(targetCell)
+        if ((actions - setOfClosed).size < 2) return true
+        return false
+    }
+
+    fun toNumber(targetCell: Cell): Boolean {
+        val (y, x) = targetCell
+        if (currentZeroPos.row == y) {
+            toDown()
+            while (x > currentZeroPos.column) toRight()
+            toUp()
+            while (leftIsEmpty()) toLeft()
+            if (currentStart != currentZeroPos) error("toStart в toNumber")
+            return true
+        }
+        while (currentZeroPos.row < y) toDown()
+        val checker = currentZeroPos.column > x
+        while (currentZeroPos.column > x) toLeft()
+        while (currentZeroPos.column < x) toRight()
+        if (checker) {
+            when {
+                downIsEmpty() -> toDown()
+                upIsEmpty() -> toUp()
+                else -> error("цель заблокирована")
+            }
+        }
+        return true
+    }
+
+    fun laySolution(type: Boolean): List<Int> {
+        val list = if (matrix.height == 4) listOf(1, 2, 3, 4, 8, 12, if (type) 15 else 14)
+        else listOf(5, 6, 7, 11, if (type) 14 else 15, 13, 9)
+        findZeroPos()
+        toStartPos()
+        for (number in list) {
+            if (targetIsBlocked(matrix.search(number))) {
+                reScroll()
+                currentStart = currentZeroPos
+                toNumber(matrix.search(number))
+                toStartPos()
+                scroll()
+                currentStart = currentZeroPos
+            }
+            while (matrix[currentStart.row, currentStart.column + 1] != number) {
+                val targetCell = matrix.search(number)
+                toNumber(targetCell)
+                toStartPos()
+            }
+            toRight()
+            setOfClosed += number
+            currentStart = currentZeroPos
+            if (currentStart == Cell(0, matrix.width - 1)) {
+                scroll()
+                currentStart = currentZeroPos
+            }
+        }
+        while (matrix[0, 0] != list[0]) {
+            reScroll()
+        }
+
+        if (matrix.height == 4) {
+            println(matrix)
+            val listForMatrix = mutableListOf<Int>()
+            for (y in 1 until 4)
+                for (x in 0 until 3)
+                    listForMatrix.add(matrix[y, x])
+            val newField = Field15(MatrixImpl<Int>(3, 3, listForMatrix))
+            newField.laySolution(type)
+            //Офигеть это работает!!!
+            newField.toDown()
+            newField.toRight()
+            newField.toRight()
+            println(newField.matrix)
+            return listOfActions + newField.listOfActions + matrix[3, 3]
+        }
+        return listOfActions
     }
 
     fun availableActions(): Map<Int, Cell> {
@@ -392,82 +538,19 @@ fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> {
  * Перед решением этой задачи НЕОБХОДИМО решить предыдущую
  */
 
-data class ElementF15(val field: Field15, val commands: List<Int>)
 
-fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
-    val field = Field15(matrix)
+
+
+fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> = Field15(matrix).laySolution(typeOfMatrix(matrix))
+
+fun typeOfMatrix(matrix: Matrix<Int>): Boolean {
     var checksum = 0
     for (i in 0 until 16) {
-        if (field.matrix[i / 4, i % 4] == 0)
-            continue
+        if (matrix[i / 4, i % 4] == 0) continue
         checksum += (i / 4) + 1
         for (j in i until 16)
-            if (field.matrix[j / 4, j % 4] < field.matrix[i / 4, i % 4] && field.matrix[j / 4, j % 4] != 0) checksum++
+            if (matrix[j / 4, j % 4] < matrix[i / 4, i % 4] && matrix[j / 4, j % 4] != 0) checksum++
     }
-    val targetField =
-        if (checksum % 2 == 0) MatrixImpl<Int>(
-            4, 4,
-            mutableListOf(
-                1, 2, 3, 4, 5, 6, 7, 8,
-                9, 10, 11, 12, 13, 14, 15, 0
-            )
-        )
-        else MatrixImpl<Int>(
-            4, 4,
-            mutableListOf(
-                1, 2, 3, 4, 5, 6, 7, 8,
-                9, 10, 11, 12, 13, 15, 14, 0
-            )
-        )
-    val startDiff = field.seeDifferences(targetField)
-    val activeElements = sortedMapOf<Int, MutableList<ElementF15>>(
-        startDiff to mutableListOf(ElementF15(field.getCopy(), listOf<Int>()))
-    )
-    val targetF15 = Field15(targetField)
-    val used = mutableSetOf<Matrix<Int>>()
-    while (activeElements.isNotEmpty()) {
-        val firstKey = activeElements.firstKey()
-        val element = activeElements[firstKey]?.removeLast() ?: error("Этого не могло произойти")
-        //замена removeLast() на removeFirst() приводит к более короткому ответу, но также и к более длительному решению
-        used.add(element.field.matrix)
-        if (activeElements[firstKey]?.isEmpty() ?: error("Этого не могло произойти"))
-            activeElements.remove(firstKey)
-        val field15 = element.field
-        val commands = element.commands
-        for (action in field15.availableActions()) {
-            val newField = field15.getCopy()
-            newField.doActualAction(action.toPair())
-            if (newField.matrix in used)
-                continue
-            val diff = newField.seeDifferences(targetField) * newField.getSimilarity(targetF15)
-            if (diff == 0)
-                return commands + action.key
-            val newElement = ElementF15(newField, commands + action.key)
-            if (activeElements[diff] == null)
-                activeElements[diff] = mutableListOf(newElement)
-            else
-                activeElements[diff]?.add(newElement) ?: error("Этого не могло произойти")
-        }
-    }
-    return listOf()
+    return checksum % 2 == 0
 }
 
-fun main() {
-    var maxTime = -0.01
-    while (true) {
-        val matrix = createMatrix(4, 4, 0)
-        val values = (0..15).toMutableSet()
-        for (y in 0 until matrix.height)
-            for (x in 0 until matrix.width) {
-                matrix[y, x] = values.random()
-                values -= matrix[y, x]
-            }
-        println("Сгенерирована матрица: \n$matrix")
-        var answer: List<Int>
-        val time = measureTimeMillis { answer = fifteenGameSolution(matrix) }.toDouble() / 1000
-        if (time > maxTime)
-            maxTime = time
-        println("Время решения: $time, максимальное время: $maxTime")
-        println(answer.size)
-    }
-}
